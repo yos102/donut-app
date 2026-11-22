@@ -1,4 +1,4 @@
-const CACHE = 'donut-guide-v1';
+const CACHE = 'donut-guide-v2';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './step1.jpg', './step2.jpg', './step3.jpg', './step4.jpg'];
 
@@ -12,9 +12,21 @@ self.addEventListener('activate', function (e) {
   }).then(function () { return self.clients.claim(); }));
 });
 
-// Cache-first; third-party files (Tailwind, fonts, confetti) are saved on first online load
+// Pages: network first (so updates show up), falling back to the saved copy offline.
+// Everything else (images, Tailwind, fonts): saved copy first, filled in on first online load.
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
+  const isPage = e.request.mode === 'navigate' || /\/index\.html$/.test(new URL(e.request.url).pathname);
+  if (isPage) {
+    e.respondWith(
+      fetch(e.request).then(function (res) {
+        const copy = res.clone();
+        caches.open(CACHE).then(function (c) { c.put('./index.html', copy); });
+        return res;
+      }).catch(function () { return caches.match('./index.html'); })
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(function (hit) {
       if (hit) return hit;
@@ -24,9 +36,15 @@ self.addEventListener('fetch', function (e) {
           caches.open(CACHE).then(function (c) { c.put(e.request, copy); });
         }
         return res;
-      }).catch(function () {
-        if (e.request.mode === 'navigate') return caches.match('./index.html');
       });
     })
   );
+});
+
+self.addEventListener('notificationclick', function (e) {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window' }).then(function (list) {
+    if (list.length) return list[0].focus();
+    return self.clients.openWindow('./');
+  }));
 });

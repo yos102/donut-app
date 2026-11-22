@@ -8,6 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="סופגניות">
   <link rel="manifest" href="manifest.webmanifest">
+  <script>try{var _s=JSON.parse(localStorage.getItem('crunch_sufganiyot_v1')||'{}');var _d=_s.theme==='dark'||((!_s.theme||_s.theme==='auto')&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);if(_d)document.documentElement.classList.add('dark');if(_s.fontScale)document.documentElement.style.fontSize=_s.fontScale+'%';}catch(e){}</script>
   <link rel="icon" href="icon-192.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <title>מאסטר סופגניות קראנצ' - מדריך מטבח חוויתי (7 ס"מ)</title>
@@ -51,6 +52,33 @@
       0%, 100% { box-shadow: 0 0 0 0 rgba(200, 90, 23, 0.35); }
       50% { box-shadow: 0 0 0 8px rgba(200, 90, 23, 0); }
     }
+    input, textarea { -webkit-user-select: text; user-select: text; }
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] .chev { transform: rotate(90deg); }
+    .chev { display: inline-block; transition: transform 0.15s ease; }
+    .alarm-shake { animation: shake 0.6s infinite; }
+    @keyframes shake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+
+    /* ---- Dark mode ---- */
+    html.dark body { background: #15110f; color: #f1e8e1; }
+    html.dark header { background: rgba(21,17,15,0.95) !important; border-color: #4a3a30 !important; }
+    html.dark nav.fixed { background: rgba(30,25,22,0.97) !important; border-color: #4a3a30 !important; }
+    html.dark .bg-white, html.dark [class*="bg-white"] { background-color: #241e1a !important; }
+    html.dark [class*="bg-stone-50"] { background-color: #2b2320 !important; }
+    html.dark [class*="bg-amber-50"] { background-color: #33261a !important; }
+    html.dark [class*="bg-emerald-50"] { background-color: #16301f !important; }
+    html.dark [class*="bg-rose-50"] { background-color: #3a1a22 !important; }
+    html.dark [class*="bg-[#EEF3F1]"] { background-color: #1b1714 !important; }
+    html.dark [class*="border-amber"], html.dark [class*="border-stone"], html.dark [class*="border-emerald"], html.dark [class*="border-rose"] { border-color: #4a3a30 !important; }
+    html.dark [class*="text-[#231815]"], html.dark [class*="text-[#3A2D28]"] { color: #f1e8e1 !important; }
+    html.dark [class*="text-[#6B5B53]"] { color: #b8a89e !important; }
+    html.dark [class*="text-amber-"]:not([class*="bg-"]) { color: #f0b36b !important; }
+    html.dark [class*="text-emerald-"]:not([class*="bg-"]) { color: #6ee7a0 !important; }
+    html.dark [class*="text-rose-"]:not([class*="bg-"]) { color: #fda4af !important; }
+    html.dark [class*="bg-[#231815]"] { background-color: #6b5444 !important; color: #fff !important; }
+    html.dark input, html.dark textarea { background: #1b1714 !important; color: #f1e8e1 !important; border-color: #4a3a30 !important; }
+    html.dark .bg-amber-100 { background-color: #4a3622 !important; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -96,6 +124,16 @@
     <!-- Toast Notification -->
     <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden bg-[#231815] text-white text-sm font-medium px-4 py-2.5 rounded-full shadow-lg whitespace-nowrap"></div>
 
+    <!-- Timer alarm overlay -->
+    <div id="alarmOverlay" class="hidden fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-6">
+      <div class="bg-white rounded-3xl p-6 text-center max-w-sm w-full shadow-2xl">
+        <div class="text-6xl mb-2 alarm-shake">⏰</div>
+        <div class="text-xl font-black mb-1 text-[#231815]">הטיימר הסתיים!</div>
+        <div id="alarmText" class="text-sm text-[#6B5B53] mb-5 whitespace-pre-line"></div>
+        <button type="button" id="alarmDismiss" class="w-full py-5 rounded-2xl bg-gradient-to-l from-amber-600 to-orange-600 text-white font-bold text-base shadow-md active:scale-95 transition">הבנתי, עצור</button>
+      </div>
+    </div>
+
     <!-- VIEW 1: STEP-BY-STEP WIZARD -->
     <section id="view-steps" class="view-panel fade-in">
       <!-- Summary KPI Chips -->
@@ -114,6 +152,16 @@
         </div>
       </div>
 
+      <!-- Quantity stepper -->
+      <div class="flex items-center justify-between bg-white rounded-2xl p-2.5 pr-4 border border-amber-100 shadow-sm mb-4">
+        <span class="text-sm font-bold text-[#231815]">כמות סופגניות (קפיצות של 3)</span>
+        <div class="flex items-center gap-2">
+          <button type="button" id="qtyMinus" class="w-12 h-12 rounded-full bg-amber-100 text-2xl font-black text-amber-900 active:scale-90 transition" aria-label="הפחת">-</button>
+          <span id="qtyValue" class="font-display text-2xl font-black w-11 text-center text-[#231815]">12</span>
+          <button type="button" id="qtyPlus" class="w-12 h-12 rounded-full bg-amber-100 text-2xl font-black text-amber-900 active:scale-90 transition" aria-label="הוסף">+</button>
+        </div>
+      </div>
+
       <!-- Step Progress Dots -->
       <div class="flex items-center justify-between gap-1.5 mb-4" id="stepDots"></div>
 
@@ -122,17 +170,23 @@
 
       <!-- Prev / Next Navigation -->
       <div class="flex items-center justify-between gap-3 mt-4">
-        <button type="button" id="prevStepBtn" class="flex-1 py-3.5 px-4 rounded-2xl bg-white border border-amber-200 text-[#231815] font-bold text-sm shadow-sm active:scale-95 transition disabled:opacity-40">
+        <button type="button" id="prevStepBtn" class="flex-1 py-5 px-4 rounded-2xl bg-white border border-amber-200 text-[#231815] font-bold text-base shadow-sm active:scale-95 transition disabled:opacity-40">
           → שלב קודם
         </button>
-        <button type="button" id="nextStepBtn" class="flex-[1.4] py-3.5 px-4 rounded-2xl bg-gradient-to-l from-amber-600 to-orange-600 text-white font-bold text-sm shadow-md active:scale-95 transition">
+        <button type="button" id="nextStepBtn" class="flex-[1.4] py-5 px-4 rounded-2xl bg-gradient-to-l from-amber-600 to-orange-600 text-white font-bold text-base shadow-md active:scale-95 transition">
           שלב הבא →
         </button>
       </div>
+      <button type="button" id="restartBtn" class="w-full mt-3 py-3 text-xs font-bold text-[#6B5B53] underline">התחל מחדש (מאפס סימונים והתקדמות)</button>
     </section>
 
     <!-- VIEW 2: INTERACTIVE INGREDIENTS CHECKLIST -->
     <section id="view-ingredients" class="view-panel hidden fade-in">
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <button type="button" data-ingmode="weigh" class="ing-mode py-3 rounded-2xl text-sm font-bold border transition">⚖️ שקילה</button>
+        <button type="button" data-ingmode="shop" class="ing-mode py-3 rounded-2xl text-sm font-bold border transition">🛒 רשימת קניות</button>
+      </div>
+      <div id="ingWeighPanel">
       <div class="bg-white rounded-3xl p-4 border border-amber-200/80 shadow-sm mb-4">
         <div class="flex items-center justify-between mb-2">
           <div>
@@ -163,6 +217,8 @@
 
       <!-- Checklist Groups -->
       <div id="ingredientsList" class="space-y-2.5"></div>
+      </div>
+      <div id="shopPanel" class="hidden"></div>
     </section>
 
     <!-- VIEW 3: INTERACTIVE X-RAY CUTAWAY EXPLORER -->
@@ -252,11 +308,103 @@
       <div id="timersGrid" class="space-y-3"></div>
     </section>
 
+    <!-- VIEW 5: MORE (pricing, troubleshooting, settings) -->
+    <section id="view-more" class="view-panel hidden fade-in space-y-4">
+
+      <div class="bg-white rounded-3xl p-4 border border-amber-200/80 shadow-sm">
+        <h2 class="text-lg font-black text-[#231815] mb-1">💰 תמחור ורווח</h2>
+        <p class="text-xs text-[#6B5B53] mb-3">לא חובה. אפשר להשאיר ריק ולחזור לזה בהמשך.</p>
+        <div class="grid grid-cols-1 gap-2.5">
+          <label class="block">
+            <span class="text-xs font-bold text-[#6B5B53]">מחיר מכירה ליחידה (₪)</span>
+            <input id="priceInput" type="text" inputmode="decimal" dir="ltr" placeholder="לא חובה" class="mt-1 w-full rounded-xl border border-amber-200 p-3 text-base text-right">
+          </label>
+          <label class="block">
+            <span class="text-xs font-bold text-[#6B5B53]">עלות חומרי גלם ליחידה (₪)</span>
+            <input id="costInput" type="text" inputmode="decimal" dir="ltr" placeholder="ריק = הערכה כללית של 5.8" class="mt-1 w-full rounded-xl border border-amber-200 p-3 text-base text-right">
+          </label>
+          <label class="block">
+            <span class="text-xs font-bold text-[#6B5B53]">אריזה ומשלוח ליחידה (₪)</span>
+            <input id="packInput" type="text" inputmode="decimal" dir="ltr" placeholder="לא חובה" class="mt-1 w-full rounded-xl border border-amber-200 p-3 text-base text-right">
+          </label>
+        </div>
+        <div id="pricingResult" class="mt-3 rounded-2xl bg-amber-50/80 border border-amber-200 p-3.5 text-sm text-[#3A2D28] space-y-1"></div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-4 border border-amber-200/80 shadow-sm">
+        <h2 class="text-lg font-black text-[#231815] mb-2">🛟 תקלות נפוצות</h2>
+        <p class="text-xs text-[#6B5B53] mb-3">טיפים כלליים לפי הטמפרטורות והשיטה במדריך.</p>
+        <div class="space-y-2">
+          <details class="rounded-2xl border border-amber-200/80 bg-stone-50 p-3">
+            <summary class="font-bold text-sm text-[#231815]"><span class="chev">◂</span> הבצק לא תפח</summary>
+            <p class="text-sm text-[#3A2D28] mt-2 leading-relaxed">בדוק שהחלב פושר ולא חם (חום גבוה הורג שמרים), שהשמרים טריים, ושהבצק במקום חמים וללא רוח. אפשר להאריך את ההתפחה ב-15 עד 20 דקות.</p>
+          </details>
+          <details class="rounded-2xl border border-amber-200/80 bg-stone-50 p-3">
+            <summary class="font-bold text-sm text-[#231815]"><span class="chev">◂</span> המוס נוזלי ולא מתייצב</summary>
+            <p class="text-sm text-[#3A2D28] mt-2 leading-relaxed">ודא שהג'לטין הוטמע במסה חמה ונמס לגמרי, ושהשמנת הוקצפה למרקם יוגורט רך. אל תקפל קצפת לגנאש חם מ-36 מעלות. תן להקפיא עוד שעה או לילה שלם.</p>
+          </details>
+          <details class="rounded-2xl border border-amber-200/80 bg-stone-50 p-3">
+            <summary class="font-bold text-sm text-[#231815]"><span class="chev">◂</span> יש גושים במוס</summary>
+            <p class="text-sm text-[#3A2D28] mt-2 leading-relaxed">כנראה שהגנאש התקרר מתחת ל-28 מעלות והג'לטין התגבש. חממו קלות את הגנאש לטווח 28 עד 36 מעלות לפני הקיפול, ועבדו מהר.</p>
+          </details>
+          <details class="rounded-2xl border border-amber-200/80 bg-stone-50 p-3">
+            <summary class="font-bold text-sm text-[#231815]"><span class="chev">◂</span> השוקולד נוזל בטבילה</summary>
+            <p class="text-sm text-[#3A2D28] mt-2 leading-relaxed">הסופגנייה חייבת להיות קפואה לגמרי (מינוס 18) והשוקולד בטווח 32 עד 34 מעלות. אם הוא חם יותר, חכו כמה דקות לפני הטבילה.</p>
+          </details>
+          <details class="rounded-2xl border border-amber-200/80 bg-stone-50 p-3">
+            <summary class="font-bold text-sm text-[#231815]"><span class="chev">◂</span> המעטפת עבה מדי או לא נסדקת יפה</summary>
+            <p class="text-sm text-[#3A2D28] mt-2 leading-relaxed">הציפוי צריך להיות דק. נערו את העודף אחרי הטבילה, ואם התערובת סמיכה הוסיפו מעט חמאת קקאו (יחס 80/20).</p>
+          </details>
+          <details class="rounded-2xl border border-amber-200/80 bg-stone-50 p-3">
+            <summary class="font-bold text-sm text-[#231815]"><span class="chev">◂</span> ריסוס הקטיפה לא נתפס או המרסס נסתם</summary>
+            <p class="text-sm text-[#3A2D28] mt-2 leading-relaxed">ודאו שהתערובת חמה (45 מעלות) והסופגנייה עדיין קפואה. סננו את התערובת לפני שמכניסים למרסס, ומרססים ממרחק של כ-25 ס"מ.</p>
+          </details>
+          <details class="rounded-2xl border border-amber-200/80 bg-stone-50 p-3">
+            <summary class="font-bold text-sm text-[#231815]"><span class="chev">◂</span> שני החצאים לא נדבקים</summary>
+            <p class="text-sm text-[#3A2D28] mt-2 leading-relaxed">מרחו שכבת קראנצ' נדיבה על הצד השטוח של הבריוש, לחצו בעדינות, והקפיאו 40 דקות לפני הטבילה.</p>
+          </details>
+          <details class="rounded-2xl border border-amber-200/80 bg-stone-50 p-3">
+            <summary class="font-bold text-sm text-[#231815]"><span class="chev">◂</span> הבריוש יבש או קשה</summary>
+            <p class="text-sm text-[#3A2D28] mt-2 leading-relaxed">כנראה שנאפה יותר מדי. התחילו לבדוק בדקה 14, ואל תעבירו את 175 מעלות. צננו לגמרי לפני החיבור.</p>
+          </details>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-4 border border-amber-200/80 shadow-sm">
+        <h2 class="text-lg font-black text-[#231815] mb-3">⚙️ הגדרות</h2>
+        <div class="space-y-4">
+          <div>
+            <div class="text-xs font-bold text-[#6B5B53] mb-1.5">מצב תצוגה</div>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" data-theme="auto" class="theme-btn py-3 rounded-xl text-sm font-bold border transition">אוטומטי</button>
+              <button type="button" data-theme="light" class="theme-btn py-3 rounded-xl text-sm font-bold border transition">בהיר</button>
+              <button type="button" data-theme="dark" class="theme-btn py-3 rounded-xl text-sm font-bold border transition">כהה</button>
+            </div>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-[#6B5B53] mb-1.5">גודל טקסט</div>
+            <div class="flex items-center gap-3">
+              <button type="button" id="fontMinus" class="w-12 h-12 rounded-full bg-amber-100 text-base font-black text-amber-900 active:scale-90 transition">א-</button>
+              <span id="fontLabel" class="font-display font-black text-lg w-16 text-center text-[#231815]">100%</span>
+              <button type="button" id="fontPlus" class="w-12 h-12 rounded-full bg-amber-100 text-xl font-black text-amber-900 active:scale-90 transition">א+</button>
+            </div>
+          </div>
+          <div>
+            <button type="button" id="keepAwakeBtn" class="w-full flex items-center justify-between py-3 px-4 rounded-xl border text-sm font-bold transition">
+              <span>השאר את המסך דלוק בזמן שהאפליקציה פתוחה</span>
+              <span id="keepAwakeState"></span>
+            </button>
+            <p class="text-[11px] text-[#6B5B53] mt-1">בזמן שטיימר רץ המסך נשאר דלוק תמיד.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Fixed Mobile Bottom Tab Bar -->
   <nav class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-amber-200/80 shadow-[0_-4px_20px_rgba(35,24,21,0.06)]">
-    <div class="max-w-xl mx-auto grid grid-cols-4 h-[70px] mb-[env(safe-area-inset-bottom)]">
+    <div class="max-w-xl mx-auto grid grid-cols-5 h-[70px] mb-[env(safe-area-inset-bottom)]">
       <button type="button" data-tab="steps" class="nav-tab flex flex-col items-center justify-center gap-0.5 text-xs font-bold transition">
         <span class="text-xl leading-none">👨‍🍳</span>
         <span>שלבים</span>
@@ -274,6 +422,10 @@
         <span>טיימרים</span>
         <span id="navTimerBadge" class="hidden absolute top-2 right-1/4 w-2.5 h-2.5 rounded-full bg-rose-600"></span>
       </button>
+      <button type="button" data-tab="more" class="nav-tab flex flex-col items-center justify-center gap-0.5 text-xs font-bold transition">
+        <span class="text-xl leading-none">⚙️</span>
+        <span>עוד</span>
+      </button>
     </div>
   </nav>
 
@@ -288,7 +440,17 @@
         ingFilter: 'all',
         checked: {},
         selectedLayer: 'shell',
-        soundOn: true
+        soundOn: true,
+        stepChecks: {},
+        have: {},
+        notes: {},
+        price: '',
+        unitCost: '',
+        pack: '',
+        theme: 'auto',
+        fontScale: 100,
+        keepAwake: false,
+        ingMode: 'weigh'
       };
 
       let state = Object.assign({}, DEFAULT_STATE);
@@ -307,7 +469,17 @@
             stepIndex: state.stepIndex,
             activeFlavor: state.activeFlavor,
             checked: state.checked,
-            soundOn: state.soundOn
+            soundOn: state.soundOn,
+            stepChecks: state.stepChecks,
+            have: state.have,
+            notes: state.notes,
+            price: state.price,
+            unitCost: state.unitCost,
+            pack: state.pack,
+            theme: state.theme,
+            fontScale: state.fontScale,
+            keepAwake: state.keepAwake,
+            ingMode: state.ingMode
           }));
         } catch (e) {}
       }
@@ -318,7 +490,7 @@
         try {
           const AudioCtx = window.AudioContext || window.webkitAudioContext;
           if (!AudioCtx) return;
-          const ctx = new AudioCtx();
+          const ctx = getAudioCtx(AudioCtx);
           const notes = type === 'celebrate' ? [523.25, 659.25, 783.99, 1046.5] : [660, 880, 660];
           notes.forEach(function (freq, i) {
             const osc = ctx.createOscillator();
@@ -378,6 +550,7 @@
         const dt = Math.max(1, Math.round((nowTs - lastTick) / 1000));
         lastTick = nowTs;
         let anyRunning = false;
+        let finished = false;
         let firstActive = null;
         timers.forEach(function (t) {
           if (t.running) {
@@ -388,18 +561,24 @@
             }
             if (t.leftSec === 0) {
               t.running = false;
-              playChime('timer');
-              try { if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 400]); } catch (e) {}
-              showToast('הטיימר הסתיים: ' + t.label + '!');
+              finished = true;
+              showAlarm(t.label);
+              notifyDone(t);
             }
           }
         });
         updateActiveTimerBanner(firstActive);
+        document.querySelectorAll('[data-quick-timer]').forEach(function (b) {
+          const tt = timers.find(function (x) { return x.id === b.getAttribute('data-quick-timer'); });
+          const c = b.querySelector('.font-mono');
+          if (tt && c) c.textContent = formatClock(tt.leftSec);
+        });
+        if (finished && state.tab === 'steps') renderStep();
         if (state.tab === 'timers') renderTimers();
         if (!anyRunning && timerInterval) {
           clearInterval(timerInterval);
           timerInterval = null;
-          releaseWakeLock();
+          if (!state.keepAwake) releaseWakeLock();
         }
       }
 
@@ -417,8 +596,8 @@
         try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
       }
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible' && timerInterval) {
-          tickTimers();
+        if (document.visibilityState === 'visible' && (timerInterval || state.keepAwake)) {
+          if (timerInterval) tickTimers();
           requestWakeLock();
         }
       });
@@ -437,6 +616,7 @@
         if (t.leftSec === 0) t.leftSec = t.defaultSec;
         t.running = !t.running;
         if (t.running) {
+          askNotifyPermission();
           ensureInterval();
           showToast('הופעל טיימר: ' + t.label);
         }
@@ -600,7 +780,7 @@
                   '• מקציפים <strong>' + sc(250) + ' מ"ל שמנת קרה</strong> למרקם יוגורט רך (<strong>' + sc(80) + '-' + sc(85) + ' ג\' לטעם</strong>).</p>' +
                 '</div>' +
                 '<div id="stepFlavorBox"></div>' +
-                '<p class="text-xs text-[#6B5B53] px-1">ממלאים את ' + state.batch + ' שקעי ה-7 ס"מ (4 מכל טעם בנגלה של 12), מהדקים מוס לדפנות, מטביעים את הליבה/אוראו במרכז, סוגרים עד 90% גובה ומקפיאים 4-5 שעות (או לילה).</p>' +
+                '<p class="text-xs text-[#6B5B53] px-1">ממלאים את ' + state.batch + ' שקעי ה-7 ס"מ (' + per + ' מכל טעם), מהדקים מוס לדפנות, מטביעים את הליבה/אוראו במרכז, סוגרים עד 90% גובה ומקפיאים 4-5 שעות (או לילה).</p>' +
               '</div>'
           },
           {
@@ -636,11 +816,11 @@
               '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
                 '<div class="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80">' +
                   '<div class="font-bold text-[#231815] mb-1">1. טבילה דקה לקראק (32-34°)</div>' +
-                  '<p>ממיסים <strong>320 ג\' שוקולד לבן + 80 ג\' חמאת קקאו</strong> בכלי צר ועמוק. נועצים שיפוד בתחתית כל סופגנייה קפואה, טובלים טבילה מהירה אחת ומחזירים למקפיא ל-<strong>15 דקות</strong>.</p>' +
+                  '<p>ממיסים <strong>' + cq(320) + ' ג\' שוקולד לבן + ' + cq(80) + ' ג\' חמאת קקאו</strong> בכלי צר ועמוק. נועצים שיפוד בתחתית כל סופגנייה קפואה, טובלים טבילה מהירה אחת ומחזירים למקפיא ל-<strong>15 דקות</strong>.</p>' +
                 '</div>' +
                 '<div class="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80">' +
                   '<div class="font-bold text-amber-900 mb-1">2. ריסוס קטיפה לפס הלבן (45°)</div>' +
-                  '<p>ממיסים במרסס <strong>100 ג\' שוקולד לבן + 65 ג\' חמאת קקאו</strong> + צבע שומני זהוב-חום (45°). מרססים בזווית מלמעלה ובזווית מלמטה ממרחק ~25 ס"מ - ומשאירים את <strong>רצועת האמצע בהירה</strong>!</p>' +
+                  '<p>ממיסים במרסס <strong>' + cq(100) + ' ג\' שוקולד לבן + ' + cq(65) + ' ג\' חמאת קקאו</strong> + צבע שומני זהוב-חום (45°). מרססים בזווית מלמעלה ובזווית מלמטה ממרחק ~25 ס"מ - ומשאירים את <strong>רצועת האמצע בהירה</strong>!</p>' +
                 '</div>' +
                 '<div class="bg-rose-50/70 rounded-2xl p-3.5 border border-rose-200/80">' +
                   '<div class="font-bold text-rose-900 mb-1">3. קישוט ואריזה (תחתית 8 ס"מ או קפסולה 8.5-9.5 ס"מ)</div>' +
@@ -706,7 +886,9 @@
           }
         });
         document.getElementById('kpiUnits').textContent = state.batch;
-        const estCost = Math.round(state.batch * 5.8);
+        document.getElementById('qtyValue').textContent = state.batch;
+        const ucNum = parseFloat(String(state.unitCost).replace(',', '.'));
+        const estCost = Math.round(state.batch * (ucNum > 0 ? ucNum : 5.8));
         document.getElementById('kpiCost').textContent = '~' + estCost + ' ₪';
         document.getElementById('soundToggle').textContent = state.soundOn ? '🔊' : '🔇';
       }
@@ -769,6 +951,8 @@
             '<h2 class="text-xl font-black text-[#231815] mb-3 leading-snug">' + cur.title + '</h2>' +
             '<div class="flex flex-wrap gap-2 mb-4">' + timerButtonsHtml + '</div>' +
             cur.bodyHtml +
+            '<div class="mt-4"><label class="text-xs font-bold text-[#6B5B53]" for="stepNote">📝 ההערות שלי לשלב</label>' +
+            '<textarea id="stepNote" rows="2" placeholder="למשל: להוסיף 5 דקות, לשנות כמות..." class="w-full mt-1 rounded-xl border border-amber-200 p-3 text-sm"></textarea></div>' +
           '</div>';
 
         if (cur.hasFlavorTabs) renderFlavorBox();
@@ -779,19 +963,52 @@
           });
         });
 
+        // Tap a block to mark it done
+        const blocks = Array.prototype.filter.call(card.querySelectorAll('.space-y-3 > div'), function (b) {
+          return b.id !== 'stepFlavorBox' && b.firstElementChild && b.firstElementChild.classList.contains('font-bold');
+        });
+        blocks.forEach(function (b, i) {
+          const key = 's' + state.stepIndex + 'b' + i;
+          const done = !!state.stepChecks[key];
+          const title = b.firstElementChild;
+          const mark = document.createElement('span');
+          mark.className = 'inline-flex items-center justify-center w-5 h-5 rounded-full border-2 text-[11px] font-black ml-1.5 align-middle ' +
+            (done ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-amber-300 text-transparent');
+          mark.textContent = '✓';
+          title.insertBefore(mark, title.firstChild);
+          b.style.cursor = 'pointer';
+          if (done) { b.style.opacity = '0.6'; title.style.textDecoration = 'line-through'; }
+          b.addEventListener('click', function (ev) {
+            if (ev.target.closest('button, a, textarea, input')) return;
+            state.stepChecks[key] = !state.stepChecks[key];
+            saveState();
+            renderStep();
+          });
+        });
+
+        const noteEl = document.getElementById('stepNote');
+        if (noteEl) {
+          noteEl.value = state.notes[state.stepIndex] || '';
+          noteEl.addEventListener('input', function () {
+            state.notes[state.stepIndex] = noteEl.value;
+            saveState();
+          });
+        }
+
         const prevBtn = document.getElementById('prevStepBtn');
         const nextBtn = document.getElementById('nextStepBtn');
         prevBtn.disabled = state.stepIndex === 0;
         if (cur.isFinal) {
           nextBtn.textContent = '🎉 סיימתי הכל!';
-          nextBtn.className = 'flex-[1.4] py-3.5 px-4 rounded-2xl bg-gradient-to-l from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-md active:scale-95 transition';
+          nextBtn.className = 'flex-[1.4] py-5 px-4 rounded-2xl bg-gradient-to-l from-emerald-600 to-teal-600 text-white font-bold text-base shadow-md active:scale-95 transition';
         } else {
           nextBtn.textContent = 'שלב הבא ←';
-          nextBtn.className = 'flex-[1.4] py-3.5 px-4 rounded-2xl bg-gradient-to-l from-amber-600 to-orange-600 text-white font-bold text-sm shadow-md active:scale-95 transition';
+          nextBtn.className = 'flex-[1.4] py-5 px-4 rounded-2xl bg-gradient-to-l from-amber-600 to-orange-600 text-white font-bold text-base shadow-md active:scale-95 transition';
         }
       }
 
       function renderIngredients() {
+        renderIngMode();
         document.getElementById('ingBatchText').textContent = state.batch;
         document.getElementById('ingPerFlavor').textContent = state.batch / 3;
 
@@ -814,7 +1031,7 @@
         listEl.innerHTML = filtered.map(function (item) {
           const isChecked = !!state.checked[item.id];
           // Coating minimum stays practical for 6 units
-          const qty = (item.cat === 'coating' && state.batch === 6) ? item.base : sc(item.base);
+          const qty = item.cat === 'coating' ? cq(item.base) : sc(item.base);
           const badge = item.cat === 'pantry'
             ? '<span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">בבית</span>'
             : item.cat === 'coating'
@@ -918,7 +1135,8 @@
           state.tab = btn.getAttribute('data-tab');
           renderTabs();
           if (state.tab === 'steps') renderStep();
-          if (state.tab === 'ingredients') renderIngredients();
+          if (state.tab === 'ingredients') { renderIngredients(); renderShop(); }
+          if (state.tab === 'more') renderMore();
           if (state.tab === 'xray') renderXray();
           if (state.tab === 'timers') renderTimers();
         });
@@ -926,12 +1144,7 @@
 
       document.querySelectorAll('.batch-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          state.batch = Number(btn.getAttribute('data-batch'));
-          saveState();
-          renderHeaderAndBatch();
-          renderStep();
-          renderIngredients();
-          showToast('הכמויות עודכנו ל-' + state.batch + ' סופגניות!');
+          setBatch(Number(btn.getAttribute('data-batch')));
         });
       });
 
@@ -994,6 +1207,299 @@
         });
       });
 
+
+      // --- AUDIO CONTEXT (reused, unlocked by first touch) ---
+      let sharedCtx = null;
+      function getAudioCtx(C) {
+        if (!sharedCtx) sharedCtx = new C();
+        if (sharedCtx.state === 'suspended') { try { sharedCtx.resume(); } catch (e) {} }
+        return sharedCtx;
+      }
+      ['touchstart', 'click'].forEach(function (ev) {
+        document.addEventListener(ev, function () {
+          try { const C = window.AudioContext || window.webkitAudioContext; if (C) getAudioCtx(C); } catch (e) {}
+        }, { once: true });
+      });
+
+      // --- QUANTITY ---
+      function cq(v) { return state.batch <= 6 ? String(v) : sc(v); }
+      function setBatch(n) {
+        n = Math.max(3, Math.min(60, Math.round(n / 3) * 3));
+        state.batch = n;
+        saveState();
+        renderHeaderAndBatch();
+        renderStep();
+        renderIngredients();
+        renderShop();
+        renderPricing();
+        showToast('הכמויות עודכנו ל-' + n + ' סופגניות');
+      }
+      document.getElementById('qtyMinus').addEventListener('click', function () { setBatch(state.batch - 3); });
+      document.getElementById('qtyPlus').addEventListener('click', function () { setBatch(state.batch + 3); });
+
+      // --- ALARM + NOTIFICATIONS ---
+      let alarmTimer = null;
+      let alarmCount = 0;
+      function ring() {
+        alarmCount += 1;
+        playChime('timer');
+        try { if (navigator.vibrate) navigator.vibrate([400, 150, 400]); } catch (e) {}
+        if (alarmCount > 48) dismissAlarm();
+      }
+      function showAlarm(label) {
+        const ov = document.getElementById('alarmOverlay');
+        const txt = document.getElementById('alarmText');
+        txt.textContent = ov.classList.contains('hidden') ? label : txt.textContent + '\n' + label;
+        ov.classList.remove('hidden');
+        if (alarmTimer) clearInterval(alarmTimer);
+        alarmCount = 0;
+        ring();
+        alarmTimer = setInterval(ring, 2500);
+      }
+      function dismissAlarm() {
+        if (alarmTimer) { clearInterval(alarmTimer); alarmTimer = null; }
+        document.getElementById('alarmOverlay').classList.add('hidden');
+        document.getElementById('alarmText').textContent = '';
+        alarmCount = 0;
+      }
+      document.getElementById('alarmDismiss').addEventListener('click', dismissAlarm);
+      function askNotifyPermission() {
+        try {
+          if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission().catch(function () {});
+          }
+        } catch (e) {}
+      }
+      function notifyDone(t) {
+        try {
+          if ('Notification' in window && Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(function (reg) {
+              reg.showNotification('הטיימר הסתיים', { body: t.label, tag: 'timer-' + t.id, vibrate: [400, 150, 400], requireInteraction: true, icon: 'icon-192.png' });
+            });
+          }
+        } catch (e) {}
+      }
+
+      // --- SWIPE BETWEEN STEPS ---
+      (function () {
+        const card = document.getElementById('stepCard');
+        let sx = 0, sy = 0, t0 = 0;
+        card.addEventListener('touchstart', function (e) {
+          const p = e.changedTouches[0];
+          sx = p.clientX; sy = p.clientY; t0 = Date.now();
+        }, { passive: true });
+        card.addEventListener('touchend', function (e) {
+          if (e.target.closest && e.target.closest('textarea, input')) return;
+          const p = e.changedTouches[0];
+          const dx = p.clientX - sx;
+          const dy = p.clientY - sy;
+          if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.5 || Date.now() - t0 > 800) return;
+          const last = getSteps().length - 1;
+          if (dx < 0 && state.stepIndex < last) document.getElementById('nextStepBtn').click();
+          if (dx > 0 && state.stepIndex > 0) document.getElementById('prevStepBtn').click();
+        }, { passive: true });
+      })();
+
+      // --- RESTART (two taps) ---
+      (function () {
+        const btn = document.getElementById('restartBtn');
+        let armed = false, tm = null;
+        btn.addEventListener('click', function () {
+          if (!armed) {
+            armed = true;
+            btn.textContent = 'לחץ שוב לאישור';
+            tm = setTimeout(function () { armed = false; btn.textContent = 'התחל מחדש (מאפס סימונים והתקדמות)'; }, 3000);
+            return;
+          }
+          clearTimeout(tm);
+          armed = false;
+          btn.textContent = 'התחל מחדש (מאפס סימונים והתקדמות)';
+          state.stepIndex = 0;
+          state.stepChecks = {};
+          saveState();
+          renderStep();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          showToast('ההתקדמות אופסה');
+        });
+      })();
+
+      // --- INGREDIENTS: weigh / shopping list ---
+      function renderIngMode() {
+        const shop = state.ingMode === 'shop';
+        document.getElementById('ingWeighPanel').classList.toggle('hidden', shop);
+        document.getElementById('shopPanel').classList.toggle('hidden', !shop);
+        document.querySelectorAll('.ing-mode').forEach(function (b) {
+          const on = b.getAttribute('data-ingmode') === state.ingMode;
+          b.className = 'ing-mode py-3 rounded-2xl text-sm font-bold border transition ' +
+            (on ? 'bg-[#231815] text-white border-[#231815] shadow-sm' : 'bg-white text-[#231815] border-amber-200');
+        });
+      }
+      document.querySelectorAll('.ing-mode').forEach(function (b) {
+        b.addEventListener('click', function () {
+          state.ingMode = b.getAttribute('data-ingmode');
+          saveState();
+          renderIngMode();
+          renderShop();
+        });
+      });
+
+      const SHOP_GROUPS = [['fridge', 'מהמקרר ומהאפייה'], ['pantry', 'מהמלאי בבית'], ['coating', 'ציפוי וריסוס']];
+      function shopQty(item) { return item.cat === 'coating' ? cq(item.base) : sc(item.base); }
+      function copyText(text) {
+        try {
+          navigator.clipboard.writeText(text).then(function () { showToast('הרשימה הועתקה'); }).catch(function () { showToast('לא הצלחתי להעתיק'); });
+        } catch (e) { showToast('לא הצלחתי להעתיק'); }
+      }
+      function shareShopList() {
+        const need = INGREDIENTS.filter(function (i) { return !state.have[i.id]; });
+        if (!need.length) { showToast('סימנת שיש לך הכל'); return; }
+        let text = 'רשימת קניות ל-' + state.batch + ' סופגניות:\n';
+        SHOP_GROUPS.forEach(function (g) {
+          const items = need.filter(function (i) { return i.cat === g[0]; });
+          if (!items.length) return;
+          text += '\n' + g[1] + ':\n';
+          items.forEach(function (i) { text += '• ' + i.name + ' - ' + shopQty(i) + ' ' + i.unit + '\n'; });
+        });
+        if (navigator.share) { navigator.share({ text: text }).catch(function () {}); } else { copyText(text); }
+      }
+      function renderShop() {
+        const el = document.getElementById('shopPanel');
+        if (!el) return;
+        const need = INGREDIENTS.filter(function (i) { return !state.have[i.id]; }).length;
+        let html =
+          '<div class="bg-white rounded-3xl p-4 border border-amber-200/80 shadow-sm mb-3">' +
+            '<h2 class="text-lg font-black text-[#231815]">רשימת קניות</h2>' +
+            '<p class="text-xs text-[#6B5B53]">ל-' + state.batch + ' סופגניות. סמן מה שכבר יש לך בבית ושתף את השאר.</p>' +
+            '<div class="flex gap-2 mt-3">' +
+              '<button type="button" id="shopShare" class="flex-[2] py-3.5 rounded-2xl bg-gradient-to-l from-amber-600 to-orange-600 text-white font-bold text-sm shadow-md active:scale-95 transition">📤 שתף או העתק (' + need + ' פריטים)</button>' +
+              '<button type="button" id="shopReset" class="flex-1 py-3.5 rounded-2xl bg-rose-50 text-rose-700 font-bold text-sm active:scale-95 transition">איפוס</button>' +
+            '</div>' +
+          '</div>';
+        SHOP_GROUPS.forEach(function (g) {
+          const items = INGREDIENTS.filter(function (i) { return i.cat === g[0]; });
+          html += '<div class="mt-3 mb-1.5 text-sm font-black text-[#231815]">' + g[1] + '</div><div class="space-y-2">' +
+            items.map(function (item) {
+              const have = !!state.have[item.id];
+              return '<button type="button" data-have-id="' + item.id + '" class="w-full text-right bg-white rounded-2xl p-3.5 border transition flex items-center justify-between gap-3 active:scale-[0.99] ' +
+                (have ? 'border-emerald-300 bg-emerald-50/40 opacity-70' : 'border-amber-100 shadow-sm') + '">' +
+                '<div class="flex items-center gap-3">' +
+                  '<span class="px-2 h-6 rounded-full border-2 flex items-center justify-center text-[11px] font-black shrink-0 ' + (have ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-amber-300 text-amber-800') + '">' + (have ? 'יש לי ✓' : 'יש לי?') + '</span>' +
+                  '<div class="font-bold text-sm ' + (have ? 'line-through text-[#6B5B53]' : 'text-[#231815]') + '">' + item.name + '</div>' +
+                '</div>' +
+                '<div class="font-display font-bold text-sm text-amber-800 whitespace-nowrap shrink-0">' + shopQty(item) + ' ' + item.unit + '</div>' +
+              '</button>';
+            }).join('') + '</div>';
+        });
+        el.innerHTML = html;
+        el.querySelectorAll('[data-have-id]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            const id = b.getAttribute('data-have-id');
+            state.have[id] = !state.have[id];
+            saveState();
+            renderShop();
+          });
+        });
+        document.getElementById('shopShare').addEventListener('click', shareShopList);
+        document.getElementById('shopReset').addEventListener('click', function () {
+          state.have = {};
+          saveState();
+          renderShop();
+        });
+      }
+
+      // --- PRICING (optional) ---
+      function parseNum(v) {
+        const n = parseFloat(String(v).replace(',', '.'));
+        return isFinite(n) && n > 0 ? n : 0;
+      }
+      function renderPricing() {
+        const el = document.getElementById('pricingResult');
+        if (!el) return;
+        const price = parseNum(state.price);
+        const uc = parseNum(state.unitCost);
+        const pack = parseNum(state.pack);
+        const costEach = (uc || 5.8) + pack;
+        const units = state.batch;
+        let html = '<div>עלות ליחידה: <strong>' + costEach.toFixed(2) + ' ₪</strong>' + (uc ? '' : ' (הערכה כללית)') + '</div>' +
+          '<div>עלות כוללת ל-' + units + ' סופגניות: <strong>' + Math.round(costEach * units) + ' ₪</strong></div>';
+        if (!price) {
+          html += '<div class="text-xs text-[#6B5B53] pt-1">הזן מחיר מכירה ליחידה כדי לראות רווח. אפשר גם להשאיר ריק.</div>';
+        } else {
+          const revenue = price * units;
+          const profit = revenue - costEach * units;
+          const margin = revenue > 0 ? Math.round((profit / revenue) * 100) : 0;
+          html += '<div>הכנסה צפויה: <strong>' + Math.round(revenue) + ' ₪</strong></div>' +
+            '<div>רווח: <strong class="' + (profit >= 0 ? 'text-emerald-700' : 'text-rose-700') + '">' + Math.round(profit) + ' ₪</strong> (' + margin + '% מהמחיר)</div>' +
+            '<div>רווח ליחידה: <strong>' + (price - costEach).toFixed(2) + ' ₪</strong></div>';
+        }
+        el.innerHTML = html;
+      }
+
+      // --- SETTINGS ---
+      function applyTheme() {
+        const dark = state.theme === 'dark' || (state.theme === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', dark ? '#15110f' : '#C85A17');
+      }
+      function applyFont() {
+        document.documentElement.style.fontSize = state.fontScale + '%';
+        const lb = document.getElementById('fontLabel');
+        if (lb) lb.textContent = state.fontScale + '%';
+      }
+      function renderSettings() {
+        document.querySelectorAll('.theme-btn').forEach(function (b) {
+          const on = b.getAttribute('data-theme') === state.theme;
+          b.className = 'theme-btn py-3 rounded-xl text-sm font-bold border transition ' +
+            (on ? 'bg-[#231815] text-white border-[#231815]' : 'bg-white text-[#231815] border-amber-200');
+        });
+        const ka = document.getElementById('keepAwakeBtn');
+        ka.className = 'w-full flex items-center justify-between py-3 px-4 rounded-xl border text-sm font-bold transition ' +
+          (state.keepAwake ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-white border-amber-200 text-[#231815]');
+        document.getElementById('keepAwakeState').textContent = state.keepAwake ? 'פעיל' : 'כבוי';
+        applyFont();
+      }
+      function renderMore() {
+        document.getElementById('priceInput').value = state.price;
+        document.getElementById('costInput').value = state.unitCost;
+        document.getElementById('packInput').value = state.pack;
+        renderSettings();
+        renderPricing();
+      }
+      [['priceInput', 'price'], ['costInput', 'unitCost'], ['packInput', 'pack']].forEach(function (pair) {
+        document.getElementById(pair[0]).addEventListener('input', function (e) {
+          state[pair[1]] = e.target.value;
+          saveState();
+          renderPricing();
+          renderHeaderAndBatch();
+        });
+      });
+      document.querySelectorAll('.theme-btn').forEach(function (b) {
+        b.addEventListener('click', function () {
+          state.theme = b.getAttribute('data-theme');
+          saveState();
+          applyTheme();
+          renderSettings();
+        });
+      });
+      if (window.matchMedia) {
+        try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { if (state.theme === 'auto') applyTheme(); }); } catch (e) {}
+      }
+      document.getElementById('fontMinus').addEventListener('click', function () {
+        state.fontScale = Math.max(85, state.fontScale - 10);
+        saveState(); applyFont();
+      });
+      document.getElementById('fontPlus').addEventListener('click', function () {
+        state.fontScale = Math.min(140, state.fontScale + 10);
+        saveState(); applyFont();
+      });
+      document.getElementById('keepAwakeBtn').addEventListener('click', function () {
+        state.keepAwake = !state.keepAwake;
+        saveState();
+        renderSettings();
+        if (state.keepAwake) requestWakeLock(); else if (!timerInterval) releaseWakeLock();
+      });
+
       // --- INSTALLABLE / OFFLINE ---
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
@@ -1008,6 +1514,12 @@
       renderIngredients();
       renderXray();
       renderTimers();
+      applyTheme();
+      applyFont();
+      renderMore();
+      renderShop();
+      renderIngMode();
+      if (state.keepAwake) requestWakeLock();
     })();
   </script>
 </body>
