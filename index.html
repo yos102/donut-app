@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#C85A17">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="סופגניות">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <title>מאסטר סופגניות קראנצ' - מדריך מטבח חוויתי (7 ס"מ)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&family=Rubik:wght@600;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg: #FFFBF5;
+      --card: #FFFFFF;
+      --ink: #231815;
+      --mute: #6B5B53;
+      --accent: #C85A17;
+      --berry: #BE123C;
+      --mint: #15803D;
+    }
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-tap-highlight-color: transparent;
+      padding-bottom: calc(92px + env(safe-area-inset-bottom));
+      -webkit-user-select: none; user-select: none;
+    }
+    h1, h2, h3, .font-display {
+      font-family: 'Rubik', sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .layer-btn { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+    .layer-btn:active { transform: scale(0.97); }
+    .fade-in { animation: fadeIn 0.22s ease-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .timer-pulse { animation: pulseRing 1.5s infinite; }
+    @keyframes pulseRing {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(200, 90, 23, 0.35); }
+      50% { box-shadow: 0 0 0 8px rgba(200, 90, 23, 0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Top App Header -->
+  <header class="sticky top-0 z-30 bg-[#FFFBF5]/95 backdrop-blur-md border-b border-amber-200/70">
+    <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <div>
+        <h1 class="text-lg sm:text-xl font-black text-[#231815] leading-tight">סופגניות קראנצ' 7 ס"מ</h1>
+        <p class="text-xs text-[#6B5B53]">שיטת חצי בריוש + חצי מוס</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Batch Size Quick Pill -->
+        <div class="inline-flex bg-amber-100/90 rounded-full p-0.5 border border-amber-200" role="group" aria-label="בחירת כמות">
+          <button type="button" data-batch="6" class="batch-btn px-2.5 py-1 text-xs font-bold rounded-full transition">6</button>
+          <button type="button" data-batch="12" class="batch-btn px-2.5 py-1 text-xs font-bold rounded-full transition">12</button>
+          <button type="button" data-batch="24" class="batch-btn px-2.5 py-1 text-xs font-bold rounded-full transition">24</button>
+        </div>
+        <!-- Sound Toggle -->
+        <button type="button" id="soundToggle" class="w-9 h-9 rounded-full bg-white border border-amber-200 flex items-center justify-center text-base shadow-sm active:scale-95 transition" title="צליל טיימרים">
+          🔊
+        </button>
+      </div>
+    </div>
+    <!-- Active Running Timer Banner (hidden when idle) -->
+    <div id="activeTimerBar" class="hidden bg-gradient-to-l from-amber-600 to-orange-600 text-white">
+      <div class="max-w-xl mx-auto px-4 py-2 flex items-center justify-between text-xs font-bold">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2 h-2 rounded-full bg-white animate-ping"></span>
+          <span id="activeTimerLabel">טיימר פעיל</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="activeTimerClock" class="font-mono text-sm tracking-wider" dir="ltr">00:00</span>
+          <button type="button" id="jumpToTimersBtn" class="underline text-amber-100">פתח</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-xl mx-auto px-4 pt-4 pb-6">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden bg-[#231815] text-white text-sm font-medium px-4 py-2.5 rounded-full shadow-lg whitespace-nowrap"></div>
+
+    <!-- VIEW 1: STEP-BY-STEP WIZARD -->
+    <section id="view-steps" class="view-panel fade-in">
+      <!-- Summary KPI Chips -->
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <div class="bg-white rounded-2xl p-3 border border-amber-100 shadow-sm text-center">
+          <div id="kpiUnits" class="font-display text-xl font-black text-amber-700">12</div>
+          <div class="text-[11px] text-[#6B5B53] font-medium">סופגניות 7 ס"מ</div>
+        </div>
+        <div class="bg-white rounded-2xl p-3 border border-amber-100 shadow-sm text-center">
+          <div id="kpiCost" class="font-display text-xl font-black text-emerald-700">~70 ₪</div>
+          <div class="text-[11px] text-[#6B5B53] font-medium">עלות חומרי גלם</div>
+        </div>
+        <div class="bg-white rounded-2xl p-3 border border-amber-100 shadow-sm text-center">
+          <div class="font-display text-xl font-black text-rose-700">1:45 ש'</div>
+          <div class="text-[11px] text-[#6B5B53] font-medium">עבודה נטו</div>
+        </div>
+      </div>
+
+      <!-- Step Progress Dots -->
+      <div class="flex items-center justify-between gap-1.5 mb-4" id="stepDots"></div>
+
+      <!-- Dynamic Step Card -->
+      <div id="stepCard" class="bg-white rounded-3xl border border-amber-200/80 shadow-md overflow-hidden"></div>
+
+      <!-- Prev / Next Navigation -->
+      <div class="flex items-center justify-between gap-3 mt-4">
+        <button type="button" id="prevStepBtn" class="flex-1 py-3.5 px-4 rounded-2xl bg-white border border-amber-200 text-[#231815] font-bold text-sm shadow-sm active:scale-95 transition disabled:opacity-40">
+          → שלב קודם
+        </button>
+        <button type="button" id="nextStepBtn" class="flex-[1.4] py-3.5 px-4 rounded-2xl bg-gradient-to-l from-amber-600 to-orange-600 text-white font-bold text-sm shadow-md active:scale-95 transition">
+          שלב הבא →
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: INTERACTIVE INGREDIENTS CHECKLIST -->
+    <section id="view-ingredients" class="view-panel hidden fade-in">
+      <div class="bg-white rounded-3xl p-4 border border-amber-200/80 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="text-lg font-black text-[#231815]">רשימת שקילה חכמה</h2>
+            <p class="text-xs text-[#6B5B53]">מכוילת ל-<span id="ingBatchText" class="font-bold text-amber-700">12</span> סופגניות (<span id="ingPerFlavor">4</span> מכל טעם)</p>
+          </div>
+          <button type="button" id="resetChecksBtn" class="text-xs font-bold text-rose-700 bg-rose-50 px-3 py-1.5 rounded-full active:scale-95 transition">
+            איפוס וי
+          </button>
+        </div>
+        <!-- Progress bar -->
+        <div class="w-full h-2.5 bg-amber-100 rounded-full overflow-hidden mb-2">
+          <div id="ingProgressBar" class="h-full bg-emerald-600 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div class="flex items-center justify-between text-xs text-[#6B5B53]">
+          <span id="ingProgressLabel">נשקלו 0 מתוך 0 רכיבים</span>
+          <span id="ingCostEstimate" class="font-bold text-emerald-700">~5.80 ₪ ליחידה</span>
+        </div>
+      </div>
+
+      <!-- Filter Pills -->
+      <div class="flex gap-2 mb-3 overflow-x-auto no-scrollbar pb-1">
+        <button type="button" data-filter="all" class="ing-filter px-3.5 py-1.5 rounded-full text-xs font-bold border transition whitespace-nowrap">הכל</button>
+        <button type="button" data-filter="pantry" class="ing-filter px-3.5 py-1.5 rounded-full text-xs font-bold border transition whitespace-nowrap">מהמלאי בבית</button>
+        <button type="button" data-filter="fridge" class="ing-filter px-3.5 py-1.5 rounded-full text-xs font-bold border transition whitespace-nowrap">מהמקרר והאפייה</button>
+        <button type="button" data-filter="coating" class="ing-filter px-3.5 py-1.5 rounded-full text-xs font-bold border transition whitespace-nowrap">ציפוי וריסוס</button>
+      </div>
+
+      <!-- Checklist Groups -->
+      <div id="ingredientsList" class="space-y-2.5"></div>
+    </section>
+
+    <!-- VIEW 3: INTERACTIVE X-RAY CUTAWAY EXPLORER -->
+    <section id="view-xray" class="view-panel hidden fade-in">
+      <div class="bg-white rounded-3xl p-4 sm:p-5 border border-amber-200/80 shadow-md">
+        <h2 class="text-lg font-black text-[#231815] mb-1">רנטגן סופגנייה - לחץ על שכבה</h2>
+        <p class="text-xs text-[#6B5B53] mb-4">גלה את הטמפרטורה, היחסים והטיפ המקצועי של כל שכבה בשיטת חצי בריוש + חצי מוס</p>
+
+        <!-- Interactive SVG Cross-Section -->
+        <div class="w-full max-w-sm mx-auto mb-4">
+          <svg viewBox="0 0 320 265" class="w-full h-auto" role="img" aria-label="חתך אינטראקטיבי של סופגניית קראנץ'">
+            <!-- Gold 8cm Board -->
+            <rect x="40" y="232" width="240" height="12" rx="6" fill="#D4A017" stroke="#9A6F00" stroke-width="1.5"/>
+            <ellipse cx="275" cy="238" rx="14" ry="6" fill="#E6B83A" stroke="#9A6F00" stroke-width="1.5"/>
+
+            <!-- Outer Crisp Chocolate Shell + Velvet Spray (Clickable) -->
+            <g class="xray-layer cursor-pointer" data-layer="shell">
+              <path d="M58,140 C58,64 106,34 160,34 C214,34 262,64 262,140 C262,202 222,232 160,232 C98,232 58,202 58,140 Z" fill="#C67D3B" stroke="#7A4414" stroke-width="3"/>
+              <!-- White Belt Band -->
+              <rect x="59" y="128" width="202" height="22" rx="4" fill="#FFF7E6" opacity="0.95"/>
+              <!-- Thin white chocolate inner rim -->
+              <path d="M66,140 C66,72 110,42 160,42 C210,42 254,72 254,140 C254,196 218,224 160,224 C102,224 66,196 66,140 Z" fill="#FFFDF9" stroke="#F0E4CE" stroke-width="3"/>
+            </g>
+
+            <!-- Top Glaze & Topping (Clickable) -->
+            <g class="xray-layer cursor-pointer" data-layer="topping">
+              <path d="M105,46 C125,33 195,33 215,46 C205,58 188,62 160,60 C132,62 115,58 105,46 Z" fill="#4A2511"/>
+              <ellipse cx="160" cy="30" rx="22" ry="11" fill="#BE123C"/>
+              <circle cx="154" cy="27" r="4" fill="#FDA4AF" opacity="0.7"/>
+            </g>
+
+            <!-- Top Mousse Dome (Clickable) -->
+            <g class="xray-layer cursor-pointer" data-layer="mousse">
+              <path d="M72,135 C72,76 112,48 160,48 C208,48 248,76 248,135 Z" fill="#F8F1E7" stroke="#DFD1BE" stroke-width="1.5"/>
+              <!-- Cookie/Vanilla specks -->
+              <circle cx="105" cy="112" r="2.5" fill="#4A3728"/>
+              <circle cx="122" cy="86" r="2" fill="#4A3728"/>
+              <circle cx="212" cy="108" r="2.5" fill="#4A3728"/>
+              <circle cx="198" cy="84" r="2" fill="#4A3728"/>
+              <circle cx="160" cy="64" r="2" fill="#4A3728"/>
+            </g>
+
+            <!-- Core / Whole Oreo (Clickable) -->
+            <g class="xray-layer cursor-pointer" data-layer="core">
+              <ellipse cx="160" cy="108" rx="34" ry="20" fill="#BE123C" stroke="#881337" stroke-width="2"/>
+              <ellipse cx="152" cy="103" rx="10" ry="5" fill="#FB7185" opacity="0.5"/>
+            </g>
+
+            <!-- Crunch & Pearls Seam Layer (Clickable) -->
+            <g class="xray-layer cursor-pointer" data-layer="crunch">
+              <rect x="74" y="135" width="172" height="16" rx="6" fill="#6F3B1E"/>
+              <circle cx="94" cy="143" r="4.5" fill="#FFFDF9"/>
+              <circle cx="114" cy="143" r="4.5" fill="#3E1F0D"/>
+              <circle cx="134" cy="143" r="4.5" fill="#D97706"/>
+              <circle cx="154" cy="143" r="4.5" fill="#FFFDF9"/>
+              <circle cx="174" cy="143" r="4.5" fill="#3E1F0D"/>
+              <circle cx="194" cy="143" r="4.5" fill="#D97706"/>
+              <circle cx="214" cy="143" r="4.5" fill="#FFFDF9"/>
+              <circle cx="230" cy="143" r="4.5" fill="#3E1F0D"/>
+            </g>
+
+            <!-- Bottom Half Brioche (Clickable) -->
+            <g class="xray-layer cursor-pointer" data-layer="brioche">
+              <path d="M74,151 L246,151 C246,196 212,220 160,220 C108,220 74,196 74,151 Z" fill="#F4CE7C" stroke="#C89333" stroke-width="1.5"/>
+              <circle cx="118" cy="182" r="2" fill="#C89333" opacity="0.6"/>
+              <circle cx="165" cy="196" r="2.5" fill="#C89333" opacity="0.6"/>
+              <circle cx="204" cy="176" r="2" fill="#C89333" opacity="0.6"/>
+              <circle cx="142" cy="170" r="1.8" fill="#C89333" opacity="0.6"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Layer Pill Selector -->
+        <div class="grid grid-cols-3 gap-2 mb-4" id="xrayPills"></div>
+
+        <!-- Layer Details Card -->
+        <div id="xrayDetail" class="rounded-2xl bg-amber-50/80 border border-amber-200 p-4"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: KITCHEN TIMERS HUB -->
+    <section id="view-timers" class="view-panel hidden fade-in">
+      <div class="mb-4">
+        <h2 class="text-lg font-black text-[#231815]">טיימרים חכמים למטבח</h2>
+        <p class="text-xs text-[#6B5B53]">הפעל כל שלב בלחיצה אחת - הטיימר ימשיך לרוץ גם כשתעבור בין השלבים</p>
+      </div>
+      <div id="timersGrid" class="space-y-3"></div>
+    </section>
+
+  </main>
+
+  <!-- Fixed Mobile Bottom Tab Bar -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-amber-200/80 shadow-[0_-4px_20px_rgba(35,24,21,0.06)]">
+    <div class="max-w-xl mx-auto grid grid-cols-4 h-[70px] mb-[env(safe-area-inset-bottom)]">
+      <button type="button" data-tab="steps" class="nav-tab flex flex-col items-center justify-center gap-0.5 text-xs font-bold transition">
+        <span class="text-xl leading-none">👨‍🍳</span>
+        <span>שלבים</span>
+      </button>
+      <button type="button" data-tab="ingredients" class="nav-tab flex flex-col items-center justify-center gap-0.5 text-xs font-bold transition">
+        <span class="text-xl leading-none">⚖️</span>
+        <span>מצרכים</span>
+      </button>
+      <button type="button" data-tab="xray" class="nav-tab flex flex-col items-center justify-center gap-0.5 text-xs font-bold transition">
+        <span class="text-xl leading-none">🍩</span>
+        <span>רנטגן</span>
+      </button>
+      <button type="button" data-tab="timers" class="nav-tab flex flex-col items-center justify-center gap-0.5 text-xs font-bold transition relative">
+        <span class="text-xl leading-none">⏱️</span>
+        <span>טיימרים</span>
+        <span id="navTimerBadge" class="hidden absolute top-2 right-1/4 w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+      </button>
+    </div>
+  </nav>
+
+  <script>
+    (function () {
+      // --- STATE ---
+      const DEFAULT_STATE = {
+        tab: 'steps',
+        batch: 12,
+        stepIndex: 0,
+        activeFlavor: 'bueno',
+        ingFilter: 'all',
+        checked: {},
+        selectedLayer: 'shell',
+        soundOn: true
+      };
+
+      let state = Object.assign({}, DEFAULT_STATE);
+      try {
+        const saved = localStorage.getItem('crunch_sufganiyot_v1');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          state = Object.assign({}, DEFAULT_STATE, parsed);
+        }
+      } catch (e) {}
+
+      function saveState() {
+        try {
+          localStorage.setItem('crunch_sufganiyot_v1', JSON.stringify({
+            batch: state.batch,
+            stepIndex: state.stepIndex,
+            activeFlavor: state.activeFlavor,
+            checked: state.checked,
+            soundOn: state.soundOn
+          }));
+        } catch (e) {}
+      }
+
+      // --- SOUND CHIME (Web Audio) ---
+      function playChime(type) {
+        if (!state.soundOn) return;
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          const ctx = new AudioCtx();
+          const notes = type === 'celebrate' ? [523.25, 659.25, 783.99, 1046.5] : [660, 880, 660];
+          notes.forEach(function (freq, i) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.14);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.14 + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + i * 0.14);
+            osc.stop(ctx.currentTime + i * 0.14 + 0.36);
+          });
+        } catch (e) {}
+      }
+
+      function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        clearTimeout(el._t);
+        el._t = setTimeout(function () { el.classList.add('hidden'); }, 2600);
+      }
+
+      // Helper for scaling grams cleanly from base=12
+      function sc(val) {
+        const scaled = (val * state.batch) / 12;
+        return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1).replace(/\.0$/, '');
+      }
+
+      // --- TIMERS DATA & ENGINE ---
+      const timers = [
+        { id: 't_rise1', label: 'התפחה ראשונה לבריוש', defaultSec: 60 * 60, leftSec: 60 * 60, running: false, step: 0 },
+        { id: 't_rise2', label: 'התפחה שנייה בתבנית 7 ס"מ', defaultSec: 35 * 60, leftSec: 35 * 60, running: false, step: 0 },
+        { id: 't_bake',  label: 'אפיית חצאי בריוש (175°)', defaultSec: 15 * 60, leftSec: 15 * 60, running: false, step: 0 },
+        { id: 't_gel',   label: 'השריית ג\'לטין במים קרים', defaultSec: 10 * 60, leftSec: 10 * 60, running: false, step: 1 },
+        { id: 't_join',  label: 'הקפאת חיבור לפני טבילה', defaultSec: 40 * 60, leftSec: 40 * 60, running: false, step: 2 },
+        { id: 't_dip',   label: 'קירור אחרי טבילה לבנה', defaultSec: 15 * 60, leftSec: 15 * 60, running: false, step: 3 }
+      ];
+
+      let timerInterval = null;
+
+      function formatClock(sec) {
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        if (h > 0) {
+          return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        }
+        return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }
+
+      let lastTick = Date.now();
+
+      function tickTimers() {
+        const nowTs = Date.now();
+        const dt = Math.max(1, Math.round((nowTs - lastTick) / 1000));
+        lastTick = nowTs;
+        let anyRunning = false;
+        let firstActive = null;
+        timers.forEach(function (t) {
+          if (t.running) {
+            if (t.leftSec > 0) {
+              t.leftSec = Math.max(0, t.leftSec - dt);
+              anyRunning = true;
+              if (!firstActive) firstActive = t;
+            }
+            if (t.leftSec === 0) {
+              t.running = false;
+              playChime('timer');
+              try { if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 400]); } catch (e) {}
+              showToast('הטיימר הסתיים: ' + t.label + '!');
+            }
+          }
+        });
+        updateActiveTimerBanner(firstActive);
+        if (state.tab === 'timers') renderTimers();
+        if (!anyRunning && timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          releaseWakeLock();
+        }
+      }
+
+      // --- KEEP SCREEN ON WHILE A TIMER RUNS ---
+      let wakeLock = null;
+      async function requestWakeLock() {
+        try {
+          if ('wakeLock' in navigator && !wakeLock) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', function () { wakeLock = null; });
+          }
+        } catch (e) {}
+      }
+      function releaseWakeLock() {
+        try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
+      }
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible' && timerInterval) {
+          tickTimers();
+          requestWakeLock();
+        }
+      });
+
+      function ensureInterval() {
+        requestWakeLock();
+        if (!timerInterval) {
+          lastTick = Date.now();
+          timerInterval = setInterval(tickTimers, 1000);
+        }
+      }
+
+      function toggleTimer(id) {
+        const t = timers.find(function (x) { return x.id === id; });
+        if (!t) return;
+        if (t.leftSec === 0) t.leftSec = t.defaultSec;
+        t.running = !t.running;
+        if (t.running) {
+          ensureInterval();
+          showToast('הופעל טיימר: ' + t.label);
+        }
+        const active = timers.find(function (x) { return x.running; });
+        updateActiveTimerBanner(active);
+        renderTimers();
+        if (state.tab === 'steps') renderStep();
+      }
+
+      function resetTimer(id) {
+        const t = timers.find(function (x) { return x.id === id; });
+        if (!t) return;
+        t.running = false;
+        t.leftSec = t.defaultSec;
+        const active = timers.find(function (x) { return x.running; });
+        updateActiveTimerBanner(active);
+        renderTimers();
+        if (state.tab === 'steps') renderStep();
+      }
+
+      function adjustTimer(id, deltaMin) {
+        const t = timers.find(function (x) { return x.id === id; });
+        if (!t) return;
+        t.leftSec = Math.max(60, t.leftSec + deltaMin * 60);
+        renderTimers();
+      }
+
+      function updateActiveTimerBanner(active) {
+        const bar = document.getElementById('activeTimerBar');
+        const badge = document.getElementById('navTimerBadge');
+        if (active) {
+          bar.classList.remove('hidden');
+          badge.classList.remove('hidden');
+          document.getElementById('activeTimerLabel').textContent = active.label;
+          document.getElementById('activeTimerClock').textContent = formatClock(active.leftSec);
+        } else {
+          bar.classList.add('hidden');
+          badge.classList.add('hidden');
+        }
+      }
+
+      // --- INGREDIENTS DATA (base = 12 units: 4 per flavor) ---
+      const INGREDIENTS = [
+        // Brioche & Fridge
+        { id: 'flour', name: 'קמח לבן (רצוי לחם)', base: 240, unit: 'גרם', cat: 'fridge', note: 'לבצק הבריוש' },
+        { id: 'sugar', name: 'סוכר לבן', base: 35, unit: 'גרם', cat: 'fridge', note: 'לבצק הבריוש' },
+        { id: 'yeast', name: 'שמרים יבשים', base: 5, unit: 'גרם', cat: 'fridge', note: 'כפית וחצי' },
+        { id: 'eggs', name: 'ביצה L + חלמון (סה"כ ~75 ג\')', base: 75, unit: 'גרם', cat: 'fridge', note: 'לעשירות הבריוש' },
+        { id: 'milk', name: 'חלב פושר', base: 65, unit: 'מ"ל', cat: 'fridge', note: 'לבצק הבריוש' },
+        { id: 'butter', name: 'חמאה רכה', base: 65, unit: 'גרם', cat: 'fridge', note: 'לקיפול בבצק' },
+        { id: 'cream_whip', name: 'שמנת מתוקה 38% (להקצפה)', base: 250, unit: 'מ"ל', cat: 'fridge', note: 'קרה מאוד - מחולקת ל-3 מוסים' },
+        { id: 'cream_hot', name: 'שמנת מתוקה 38% (לחימום)', base: 120, unit: 'מ"ל', cat: 'fridge', note: '40 מ"ל חמה לכל מוס' },
+        { id: 'gelatin', name: 'אבקת ג\'לטין (+ מים קרים x5)', base: 6, unit: 'גרם', cat: 'fridge', note: 'משרים ב-30 ג\' מים קרים' },
+        // Pantry (User already has!)
+        { id: 'choc_mousse', name: 'שוקולד לבן (ל-3 המוסים)', base: 150, unit: 'גרם', cat: 'pantry', note: '40 בואנו + 40 אוראו + 70 תות' },
+        { id: 'nocciola', name: 'UNIQUE White Nocciola Crunchy', base: 90, unit: 'גרם', cat: 'pantry', note: '45 ג\' למוס + 45 ג\' לקראנצ\' על הבריוש' },
+        { id: 'ferrero', name: 'SPREAD IT קרם פררו (לליבות)', base: 60, unit: 'גרם', cat: 'pantry', note: '4 ליבות בתבנית 3.5 ס"מ' },
+        { id: 'white_cookies', name: 'UNIQUE White Cookies Cream', base: 90, unit: 'גרם', cat: 'pantry', note: '50 ג\' למוס + 40 ג\' להדבקת הפנינים' },
+        { id: 'oreos', name: 'עוגיות אוראו שלמות', base: 6, unit: 'יח\'', cat: 'fridge', note: '4 שלמות בפנים + 2 חצויות לקישוט' },
+        { id: 'pearls', name: 'Cookstock פניני קראנצ\' מיקס', base: 50, unit: 'גרם', cat: 'pantry', note: 'לשכבת הקראנצ\' באוראו ולקישוט' },
+        { id: 'strawberry', name: 'שף קונדיטור מילוי תות שדה', base: 85, unit: 'גרם', cat: 'pantry', note: '70 ג\' לליבות + 15 ג\' לטיפה מעל' },
+        { id: 'petit', name: 'SPREAD IT ממרח פתיבר קראנצ\'', base: 60, unit: 'גרם', cat: 'pantry', note: 'שכבת קראנצ\' לתות וניל' },
+        { id: 'mekupelet', name: 'מיני מקופלת (לקישוט בואנו)', base: 2, unit: 'יח\'', cat: 'pantry', note: 'חצי מקופלת מעל כל סופגנייה' },
+        // Coating & Spray (minimum dip depth stays >= 240g)
+        { id: 'dip_choc', name: 'שוקולד לבן לטבילה (80/20)', base: 320, unit: 'גרם', cat: 'coating', note: 'כולל עומק לכלי טבילה - השארית נשמרת!' },
+        { id: 'dip_cb', name: 'חמאת קקאו לטבילה (80/20)', base: 80, unit: 'גרם', cat: 'coating', note: 'למעטפת קראק דקה ופציחה' },
+        { id: 'spray_choc', name: 'שוקולד לבן לריסוס קטיפה (60/40)', base: 100, unit: 'גרם', cat: 'coating', note: '+ צבע שומני זהוב-חום במרסס' },
+        { id: 'spray_cb', name: 'חמאת קקאו לריסוס קטיפה (60/40)', base: 65, unit: 'גרם', cat: 'coating', note: 'מחממים ל-45 מעלות במרסס' }
+      ];
+
+      // --- X-RAY LAYERS DATA ---
+      const LAYERS = [
+        {
+          id: 'shell',
+          name: 'מעטפת + פס לבן',
+          badge: '80/20 + 60/40',
+          title: 'מעטפת הקראק (80/20) + ריסוס הקטיפה (60/40)',
+          desc: 'קודם טבילה אחת דקה בשוקולד לבן + חמאת קקאו (32-34°) שנותנת את הפיצוח החד בביס. מיד אחרי צינון של 15 דק\', מרססים תערובת קטיפה (60% שוקולד לבן / 40% חמאת קקאו + צבע זהוב-חום ב-45°) בזווית למעלה ולמטה כדי להשאיר פס לבן מושלם באמצע.',
+          tip: 'הסופגנייה חייבת להיות קפואה לחלוטין (-18°) בזמן הטבילה והריסוס, אחרת השוקולד ינזל והקטיפה לא תיתפס.'
+        },
+        {
+          id: 'topping',
+          name: 'קישוט עליון',
+          badge: 'אפקט הוואו',
+          title: 'גימור עליון לפי הטעם',
+          desc: 'תות וניל מקבל אבקת סוכר שאינה נמסה + טיפת מילוי תות מבריקה. אוראו מקבל טבילת קצה בשוקולד מריר + חצי עוגיית אוראו ופניני קראנצ\'. בואנו-פררו מקבל זיגוג שוקולד/פררו + חצי מיני מקופלת.',
+          tip: 'מצמידים את הקישוטים 5 שניות אחרי טבילת הקצה - לפני שהשוקולד מתקשה.'
+        },
+        {
+          id: 'mousse',
+          name: 'כיפת המוס',
+          badge: 'חצי עליון 7 ס"מ',
+          title: 'מוס אוורירי מיוצב בג\'לטין',
+          desc: 'חצי כדור 7 ס"מ אחד בלבד לכל סופגנייה (~80 מ"ל). מכינים קצפת אחת (250 מ"ל) ומסת ג\'לטין אחת ומפצלים ל-3 טעמים: בואנו לאטה, אוראו לבן, וניל מדגסקר.',
+          tip: 'לא מקפלים קצפת כשהגנאש חם מ-36° (היא תימס) ולא קר מ-28° (הג\'לטין יתגבש לגושים).'
+        },
+        {
+          id: 'core',
+          name: 'ליבה / אוראו שלם',
+          badge: 'הפתעה בחיתוך',
+          title: 'ליבה קפואה 3.5 ס"מ (או אוראו שלם!)',
+          desc: 'בבואנו ובתות מטביעים ליבה קפואה מתבנית ה-3.5 ס"מ (קרם פררו / מילוי תות). באוראו מאמצים את הטריק של עדן ברזי: מטביעים עוגיית אוראו שלמה (4.5 ס"מ) ישר בתוך המוס!',
+          tip: 'מקפיאים את ליבות הממרחים לפחות שעתיים-שלוש כדי שייצאו שלמות מהסיליקון.'
+        },
+        {
+          id: 'crunch',
+          name: 'שכבת הקראנצ\'',
+          badge: 'קו החיבור',
+          title: 'מחסום הפריכות בין הבריוש למוס',
+          desc: 'מורחים על הצד השטוח של חצי הבריוש שכבת ממרח שומני קראנצ\'י (White Nocciola / White Cookies + פניני קראנצ\' מיקס / פתיבר קראנצ\'). זה גם מדביק את כיפת המוס וגם שומר שהבריוש לא יירטב.',
+          tip: 'השכבה השומנית אוטמת את הבריוש כך שיישאר רך גם אחרי 3 ימים במקרר.'
+        },
+        {
+          id: 'brioche',
+          name: 'חצי בריוש',
+          badge: 'חצי תחתון 7 ס"מ',
+          title: 'חצי כדור בריוש אפוי ישר בתבנית ה-7 ס"מ',
+          desc: 'במקום להקפיא עוד חצי מוס, אופים כדורי בצק בריוש (~35 ג\' כל אחד) ישירות בתוך שקעי הסיליקון 7 ס"מ. זה חוסך 30% עלות, מקצר חצי מזמן ההקפאה ונותן ביס אמיתי של סופגנייה.',
+          tip: 'אם הבריוש תפח קצת מעל השפה באפייה, מיישרים בעדינות בסכין משוננת אחרי צינון מלא.'
+        }
+      ];
+
+      // --- STEPS DATA ---
+      function getSteps() {
+        const per = state.batch / 3;
+        return [
+          {
+            num: 1,
+            title: 'ליבות 3.5 ס"מ ואפיית חצאי הבריוש',
+            time: '35 דק\' נטו | + התפחה ואפייה',
+            img: 'step1.jpg',
+            timers: ['t_rise1', 't_rise2', 't_bake'],
+            bodyHtml:
+              '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
+                '<div class="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80">' +
+                  '<div class="font-bold text-amber-900 mb-1">1. הקפאת ליבות (בתבנית 3.5 ס"מ שלך)</div>' +
+                  '<p>מזלפים <strong>' + per + ' ליבות קרם פררו</strong> (' + sc(60) + ' ג\') ו-<strong>' + per + ' ליבות מילוי תות שדה</strong> (' + sc(70) + ' ג\') לשקעי ה-3.5 ס"מ ומקפיאים שעתיים+. (לאוראו לא צריך ליבה - שמים עוגייה שלמה!)</p>' +
+                '</div>' +
+                '<div class="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80">' +
+                  '<div class="font-bold text-[#231815] mb-1">2. בצק בריוש (' + state.batch + ' חצאים)</div>' +
+                  '<p>לשים <strong>' + sc(240) + ' ג\' קמח</strong>, <strong>' + sc(35) + ' ג\' סוכר</strong>, <strong>' + sc(5) + ' ג\' שמרים</strong>, <strong>' + sc(75) + ' ג\' ביצים</strong> ו-<strong>' + sc(65) + ' מ"ל חלב</strong> 5 דק\'. מוסיפים <strong>' + sc(3) + ' ג\' מלח</strong> ו-<strong>' + sc(65) + ' ג\' חמאה רכה</strong> ולשים 7 דק\'. מתפיחים שעה.</p>' +
+                '</div>' +
+                '<div class="bg-emerald-50/70 rounded-2xl p-3.5 border border-emerald-200/80">' +
+                  '<div class="font-bold text-emerald-900 mb-1">3. אפייה ישר בתבניות ה-7 ס"מ</div>' +
+                  '<p>מחלקים ל-<strong>' + state.batch + ' כדורים של ~35 ג\'</strong>, משמנים קלות את שקעי תבנית ה-7 ס"מ, מתפיחים 35 דק\' עד השפה ואופים ב-<strong>175° למשך 14-16 דק\'</strong>. מצננים, מיישרים שפה בסכין, ושוטפים את התבניות לשלב המוס.</p>' +
+                '</div>' +
+              '</div>'
+          },
+          {
+            num: 2,
+            title: '3 מוסים מקערה אחת ומילוי כיפות 7 ס"מ',
+            time: '30 דק\' נטו | + 4-5 ש\' הקפאה (או לילה)',
+            img: 'step2.jpg',
+            timers: ['t_gel'],
+            hasFlavorTabs: true,
+            bodyHtml:
+              '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
+                '<div class="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80">' +
+                  '<div class="font-bold text-amber-900 mb-1">בסיס משותף ל-3 הטעמים:</div>' +
+                  '<p>• משרים <strong>' + sc(6) + ' ג\' ג\'לטין + ' + sc(30) + ' ג\' מים קרים</strong> ל-10 דק\' (מחלקים ל-<strong>' + sc(12) + ' ג\' לטעם</strong>).<br>' +
+                  '• מקציפים <strong>' + sc(250) + ' מ"ל שמנת קרה</strong> למרקם יוגורט רך (<strong>' + sc(80) + '-' + sc(85) + ' ג\' לטעם</strong>).</p>' +
+                '</div>' +
+                '<div id="stepFlavorBox"></div>' +
+                '<p class="text-xs text-[#6B5B53] px-1">ממלאים את ' + state.batch + ' שקעי ה-7 ס"מ (4 מכל טעם בנגלה של 12), מהדקים מוס לדפנות, מטביעים את הליבה/אוראו במרכז, סוגרים עד 90% גובה ומקפיאים 4-5 שעות (או לילה).</p>' +
+              '</div>'
+          },
+          {
+            num: 3,
+            title: 'קראנצ\' על הבריוש וחיבור שני החצאים',
+            time: '15 דק\' נטו | + 40 דק\' הקפאה',
+            img: 'step3.jpg',
+            timers: ['t_join'],
+            bodyHtml:
+              '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
+                '<div class="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80">' +
+                  '<div class="font-bold text-[#231815] mb-1">1. מורחים שכבת קראנצ\' על חצאי הבריוש</div>' +
+                  '<ul class="space-y-1 pr-4 list-disc">' +
+                    '<li><strong>בואנו-פררו (' + per + ' יח\'):</strong> מריחה נדיבה של <strong>White Nocciola Crunchy</strong>.</li>' +
+                    '<li><strong>אוראו (' + per + ' יח\'):</strong> מריחה של <strong>White Cookies</strong> + שכבת <strong>פניני קראנצ\' מיקס</strong>.</li>' +
+                    '<li><strong>תות וניל (' + per + ' יח\'):</strong> מריחה של <strong>ממרח פתיבר קראנצ\'</strong>.</li>' +
+                  '</ul>' +
+                '</div>' +
+                '<div class="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80">' +
+                  '<div class="font-bold text-amber-900 mb-1">2. מצמידים ומקפיאים קצר</div>' +
+                  '<p>עובדים עם כפפות: מחלצים כל כיפת מוס קפואה מהסיליקון, מניחים ישר מעל חצי הבריוש המרוח בקראנצ\' ולוחצים בעדינות. מחזירים למקפיא ל-<strong>40 דקות</strong> כדי שהבריוש יתקרר היטב לפני הטבילה.</p>' +
+                '</div>' +
+              '</div>'
+          },
+          {
+            num: 4,
+            title: 'טבילת קראק (80/20), ריסוס פס לבן וגימור!',
+            time: '25 דק\' נטו | מוכן להקפאה או הגשה',
+            img: 'step4.jpg',
+            timers: ['t_dip'],
+            isFinal: true,
+            bodyHtml:
+              '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
+                '<div class="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80">' +
+                  '<div class="font-bold text-[#231815] mb-1">1. טבילה דקה לקראק (32-34°)</div>' +
+                  '<p>ממיסים <strong>320 ג\' שוקולד לבן + 80 ג\' חמאת קקאו</strong> בכלי צר ועמוק. נועצים שיפוד בתחתית כל סופגנייה קפואה, טובלים טבילה מהירה אחת ומחזירים למקפיא ל-<strong>15 דקות</strong>.</p>' +
+                '</div>' +
+                '<div class="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80">' +
+                  '<div class="font-bold text-amber-900 mb-1">2. ריסוס קטיפה לפס הלבן (45°)</div>' +
+                  '<p>ממיסים במרסס <strong>100 ג\' שוקולד לבן + 65 ג\' חמאת קקאו</strong> + צבע שומני זהוב-חום (45°). מרססים בזווית מלמעלה ובזווית מלמטה ממרחק ~25 ס"מ - ומשאירים את <strong>רצועת האמצע בהירה</strong>!</p>' +
+                '</div>' +
+                '<div class="bg-rose-50/70 rounded-2xl p-3.5 border border-rose-200/80">' +
+                  '<div class="font-bold text-rose-900 mb-1">3. קישוט ואריזה (תחתית 8 ס"מ או קפסולה 8.5-9.5 ס"מ)</div>' +
+                  '<p>• <strong>תות וניל:</strong> אבקת סוכר שאינה נמסה + טיפת מילוי תות.<br>' +
+                  '• <strong>אוראו:</strong> טבילת קצה בשוקולד מריר + חצי אוראו + פניני קראנצ\'.<br>' +
+                  '• <strong>בואנו-פררו:</strong> זיגוג שוקולד/פררו + חצי מיני מקופלת.<br>' +
+                  '<span class="block mt-1.5 text-xs text-rose-800 font-bold">שומרים במקפיא עד חודש, ומפשירים במקרר 4-5 שעות לפני אכילה!</span></p>' +
+                '</div>' +
+              '</div>'
+          }
+        ];
+      }
+
+      function renderFlavorBox() {
+        const box = document.getElementById('stepFlavorBox');
+        if (!box) return;
+        const per = state.batch / 3;
+        const flavors = {
+          bueno: {
+            title: 'בואנו-פררו (' + per + ' כיפות)',
+            color: 'amber',
+            text: 'מחממים <strong>' + sc(40) + ' מ"ל שמנת</strong> + ממיסים <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(40) + ' ג\' שוקולד לבן + ' + sc(45) + ' ג\' White Nocciola</strong>. מערבבים חלק, מצננים ל-34° ומקפלים <strong>' + sc(80) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>ליבת קרם פררו קפואה</strong>.'
+          },
+          oreo: {
+            title: 'אוראו קראנצ\' (' + per + ' כיפות)',
+            color: 'stone',
+            text: 'מחממים <strong>' + sc(40) + ' מ"ל שמנת</strong> + <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(40) + ' ג\' שוקולד לבן</strong>, מערבבים פנימה <strong>' + sc(50) + ' ג\' White Cookies</strong> (בלי לטחון!), מצננים ל-34° ומקפלים <strong>' + sc(80) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>עוגיית אוראו שלמה</strong>!'
+          },
+          strawberry: {
+            title: 'תות שדה וניל (' + per + ' כיפות)',
+            color: 'rose',
+            text: 'מחממים <strong>' + sc(40) + ' מ"ל שמנת</strong> עם <strong>חצי כפית וניל</strong> + <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(70) + ' ג\' שוקולד לבן</strong>. טוחנים חלק, מצננים ל-34° ומקפלים <strong>' + sc(85) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>ליבת מילוי תות קפואה</strong>.'
+          }
+        };
+        const f = flavors[state.activeFlavor];
+        box.innerHTML =
+          '<div class="flex gap-1.5 mb-2">' +
+            '<button type="button" data-flavor="bueno" class="flavor-pill flex-1 py-2 rounded-xl text-xs font-bold border transition ' + (state.activeFlavor === 'bueno' ? 'bg-amber-600 text-white border-amber-600 shadow-sm' : 'bg-white text-[#231815] border-amber-200') + '">🍫 בואנו</button>' +
+            '<button type="button" data-flavor="oreo" class="flavor-pill flex-1 py-2 rounded-xl text-xs font-bold border transition ' + (state.activeFlavor === 'oreo' ? 'bg-[#231815] text-white border-[#231815] shadow-sm' : 'bg-white text-[#231815] border-amber-200') + '">🍪 אוראו</button>' +
+            '<button type="button" data-flavor="strawberry" class="flavor-pill flex-1 py-2 rounded-xl text-xs font-bold border transition ' + (state.activeFlavor === 'strawberry' ? 'bg-rose-600 text-white border-rose-600 shadow-sm' : 'bg-white text-[#231815] border-amber-200') + '">🍓 תות וניל</button>' +
+          '</div>' +
+          '<div class="rounded-2xl p-3.5 bg-white border-2 border-amber-200">' +
+            '<div class="font-bold text-[#231815] mb-1">' + f.title + '</div>' +
+            '<p class="text-sm text-[#3A2D28]">' + f.text + '</p>' +
+          '</div>';
+
+        box.querySelectorAll('.flavor-pill').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            state.activeFlavor = btn.getAttribute('data-flavor');
+            renderFlavorBox();
+          });
+        });
+      }
+
+      // --- RENDERERS ---
+      function renderHeaderAndBatch() {
+        document.querySelectorAll('.batch-btn').forEach(function (btn) {
+          const val = Number(btn.getAttribute('data-batch'));
+          if (val === state.batch) {
+            btn.className = 'batch-btn px-2.5 py-1 text-xs font-bold rounded-full transition bg-[#231815] text-white shadow-sm';
+          } else {
+            btn.className = 'batch-btn px-2.5 py-1 text-xs font-bold rounded-full transition text-[#6B5B53]';
+          }
+        });
+        document.getElementById('kpiUnits').textContent = state.batch;
+        const estCost = Math.round(state.batch * 5.8);
+        document.getElementById('kpiCost').textContent = '~' + estCost + ' ₪';
+        document.getElementById('soundToggle').textContent = state.soundOn ? '🔊' : '🔇';
+      }
+
+      function renderTabs() {
+        document.querySelectorAll('.view-panel').forEach(function (panel) {
+          panel.classList.add('hidden');
+        });
+        const activePanel = document.getElementById('view-' + state.tab);
+        if (activePanel) activePanel.classList.remove('hidden');
+
+        document.querySelectorAll('.nav-tab').forEach(function (btn) {
+          const isCurrent = btn.getAttribute('data-tab') === state.tab;
+          btn.classList.toggle('text-amber-700', isCurrent);
+          btn.classList.toggle('text-[#6B5B53]', !isCurrent);
+          btn.classList.toggle('bg-amber-50/70', isCurrent);
+        });
+      }
+
+      function renderStep() {
+        const steps = getSteps();
+        const cur = steps[state.stepIndex];
+
+        // Dots
+        const dotsEl = document.getElementById('stepDots');
+        dotsEl.innerHTML = steps.map(function (s, idx) {
+          const active = idx === state.stepIndex;
+          const done = idx < state.stepIndex;
+          return '<button type="button" data-step-jump="' + idx + '" class="flex-1 h-2.5 rounded-full transition-all ' +
+            (active ? 'bg-amber-600' : done ? 'bg-emerald-500' : 'bg-amber-200/80') +
+            '" aria-label="שלב ' + s.num + '"></button>';
+        }).join('');
+        dotsEl.querySelectorAll('button').forEach(function (b) {
+          b.addEventListener('click', function () {
+            state.stepIndex = Number(b.getAttribute('data-step-jump'));
+            saveState();
+            renderStep();
+          });
+        });
+
+        // Quick timer chips for this step
+        const timerButtonsHtml = cur.timers.map(function (tid) {
+          const t = timers.find(function (x) { return x.id === tid; });
+          if (!t) return '';
+          return '<button type="button" data-quick-timer="' + t.id + '" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition active:scale-95 ' +
+            (t.running ? 'bg-amber-600 text-white border-amber-600 timer-pulse' : 'bg-amber-50 text-amber-900 border-amber-200') + '">' +
+            '<span>⏱️ ' + t.label + '</span>' +
+            '<span class="font-mono" dir="ltr">' + formatClock(t.leftSec) + '</span>' +
+          '</button>';
+        }).join('');
+
+        const card = document.getElementById('stepCard');
+        card.innerHTML =
+          '<div class="relative bg-[#EEF3F1]">' +
+            '<img src="' + cur.img + '" alt="' + cur.title + '" class="w-full h-auto max-h-60 object-cover block">' +
+            '<div class="absolute top-3 right-3 bg-[#231815]/85 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full">שלב ' + cur.num + ' מתוך ' + steps.length + '</div>' +
+          '</div>' +
+          '<div class="p-4 sm:p-5">' +
+            '<div class="text-xs font-bold text-amber-700 mb-1">' + cur.time + '</div>' +
+            '<h2 class="text-xl font-black text-[#231815] mb-3 leading-snug">' + cur.title + '</h2>' +
+            '<div class="flex flex-wrap gap-2 mb-4">' + timerButtonsHtml + '</div>' +
+            cur.bodyHtml +
+          '</div>';
+
+        if (cur.hasFlavorTabs) renderFlavorBox();
+
+        card.querySelectorAll('[data-quick-timer]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            toggleTimer(btn.getAttribute('data-quick-timer'));
+          });
+        });
+
+        const prevBtn = document.getElementById('prevStepBtn');
+        const nextBtn = document.getElementById('nextStepBtn');
+        prevBtn.disabled = state.stepIndex === 0;
+        if (cur.isFinal) {
+          nextBtn.textContent = '🎉 סיימתי הכל!';
+          nextBtn.className = 'flex-[1.4] py-3.5 px-4 rounded-2xl bg-gradient-to-l from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-md active:scale-95 transition';
+        } else {
+          nextBtn.textContent = 'שלב הבא ←';
+          nextBtn.className = 'flex-[1.4] py-3.5 px-4 rounded-2xl bg-gradient-to-l from-amber-600 to-orange-600 text-white font-bold text-sm shadow-md active:scale-95 transition';
+        }
+      }
+
+      function renderIngredients() {
+        document.getElementById('ingBatchText').textContent = state.batch;
+        document.getElementById('ingPerFlavor').textContent = state.batch / 3;
+
+        document.querySelectorAll('.ing-filter').forEach(function (btn) {
+          const active = btn.getAttribute('data-filter') === state.ingFilter;
+          btn.className = 'ing-filter px-3.5 py-1.5 rounded-full text-xs font-bold border transition whitespace-nowrap ' +
+            (active ? 'bg-[#231815] text-white border-[#231815]' : 'bg-white text-[#6B5B53] border-amber-200');
+        });
+
+        const filtered = INGREDIENTS.filter(function (item) {
+          return state.ingFilter === 'all' || item.cat === state.ingFilter;
+        });
+
+        const totalChecked = INGREDIENTS.filter(function (item) { return !!state.checked[item.id]; }).length;
+        const pct = Math.round((totalChecked / INGREDIENTS.length) * 100);
+        document.getElementById('ingProgressBar').style.width = pct + '%';
+        document.getElementById('ingProgressLabel').textContent = 'נשקלו ' + totalChecked + ' מתוך ' + INGREDIENTS.length + ' רכיבים';
+
+        const listEl = document.getElementById('ingredientsList');
+        listEl.innerHTML = filtered.map(function (item) {
+          const isChecked = !!state.checked[item.id];
+          // Coating minimum stays practical for 6 units
+          const qty = (item.cat === 'coating' && state.batch === 6) ? item.base : sc(item.base);
+          const badge = item.cat === 'pantry'
+            ? '<span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">בבית</span>'
+            : item.cat === 'coating'
+              ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">ציפוי</span>'
+              : '<span class="text-[10px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full">מקרר/אפייה</span>';
+
+          return '<button type="button" data-check-id="' + item.id + '" class="w-full text-right bg-white rounded-2xl p-3.5 border transition flex items-center justify-between gap-3 active:scale-[0.99] ' +
+            (isChecked ? 'border-emerald-300 bg-emerald-50/40 opacity-75' : 'border-amber-100 shadow-sm') + '">' +
+            '<div class="flex items-center gap-3">' +
+              '<span class="w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-black shrink-0 ' +
+                (isChecked ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-amber-300 text-transparent') + '">✓</span>' +
+              '<div>' +
+                '<div class="font-bold text-sm ' + (isChecked ? 'line-through text-[#6B5B53]' : 'text-[#231815]') + '">' + item.name + ' ' + badge + '</div>' +
+                '<div class="text-xs text-[#6B5B53]">' + item.note + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="font-display font-bold text-sm text-amber-800 whitespace-nowrap shrink-0">' + qty + ' ' + item.unit + '</div>' +
+          '</button>';
+        }).join('');
+
+        listEl.querySelectorAll('[data-check-id]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const id = btn.getAttribute('data-check-id');
+            state.checked[id] = !state.checked[id];
+            saveState();
+            renderIngredients();
+          });
+        });
+      }
+
+      function renderXray() {
+        const pillsEl = document.getElementById('xrayPills');
+        pillsEl.innerHTML = LAYERS.map(function (l) {
+          const active = l.id === state.selectedLayer;
+          return '<button type="button" data-layer-pill="' + l.id + '" class="layer-btn py-2 px-2 rounded-xl text-xs font-bold border transition ' +
+            (active ? 'bg-[#231815] text-white border-[#231815] shadow-sm' : 'bg-white text-[#231815] border-amber-200') + '">' +
+            l.name +
+          '</button>';
+        }).join('');
+
+        pillsEl.querySelectorAll('[data-layer-pill]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            state.selectedLayer = btn.getAttribute('data-layer-pill');
+            renderXray();
+          });
+        });
+
+        document.querySelectorAll('.xray-layer').forEach(function (g) {
+          const isSel = g.getAttribute('data-layer') === state.selectedLayer;
+          g.style.opacity = isSel ? '1' : '0.45';
+          g.style.transition = 'opacity 0.2s ease';
+        });
+
+        const cur = LAYERS.find(function (l) { return l.id === state.selectedLayer; }) || LAYERS[0];
+        document.getElementById('xrayDetail').innerHTML =
+          '<div class="flex items-center justify-between gap-2 mb-1.5">' +
+            '<h3 class="text-base font-black text-[#231815]">' + cur.title + '</h3>' +
+            '<span class="text-[11px] font-bold bg-amber-200/80 text-amber-900 px-2.5 py-0.5 rounded-full whitespace-nowrap">' + cur.badge + '</span>' +
+          '</div>' +
+          '<p class="text-sm text-[#3A2D28] mb-2.5 leading-relaxed">' + cur.desc + '</p>' +
+          '<div class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5">💡 טיפ של קונדיטור: ' + cur.tip + '</div>';
+      }
+
+      function renderTimers() {
+        const grid = document.getElementById('timersGrid');
+        grid.innerHTML = timers.map(function (t) {
+          return '<div class="bg-white rounded-2xl p-4 border shadow-sm flex items-center justify-between gap-3 ' +
+            (t.running ? 'border-amber-500 ring-2 ring-amber-200' : 'border-amber-100') + '">' +
+            '<div>' +
+              '<div class="font-bold text-sm text-[#231815]">' + t.label + '</div>' +
+              '<div class="font-mono text-2xl font-black mt-0.5 ' + (t.running ? 'text-amber-600' : 'text-[#231815]') + '" dir="ltr">' + formatClock(t.leftSec) + '</div>' +
+              '<div class="flex gap-1.5 mt-1.5">' +
+                '<button type="button" data-t-adj="' + t.id + '" data-delta="-1" class="text-[11px] font-bold bg-stone-100 text-[#6B5B53] px-2 py-0.5 rounded-md active:scale-95">-1 דק\'</button>' +
+                '<button type="button" data-t-adj="' + t.id + '" data-delta="1" class="text-[11px] font-bold bg-stone-100 text-[#6B5B53] px-2 py-0.5 rounded-md active:scale-95">+1 דק\'</button>' +
+                '<button type="button" data-t-reset="' + t.id + '" class="text-[11px] font-bold bg-stone-100 text-rose-700 px-2 py-0.5 rounded-md active:scale-95">איפוס</button>' +
+              '</div>' +
+            '</div>' +
+            '<button type="button" data-t-toggle="' + t.id + '" class="px-4 py-3 rounded-2xl font-bold text-xs shadow-sm active:scale-95 transition shrink-0 ' +
+              (t.running ? 'bg-rose-600 text-white' : 'bg-amber-600 text-white') + '">' +
+              (t.running ? '⏸ עצור' : '▶ הפעל') +
+            '</button>' +
+          '</div>';
+        }).join('');
+
+        grid.querySelectorAll('[data-t-toggle]').forEach(function (b) {
+          b.addEventListener('click', function () { toggleTimer(b.getAttribute('data-t-toggle')); });
+        });
+        grid.querySelectorAll('[data-t-reset]').forEach(function (b) {
+          b.addEventListener('click', function () { resetTimer(b.getAttribute('data-t-reset')); });
+        });
+        grid.querySelectorAll('[data-t-adj]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            adjustTimer(b.getAttribute('data-t-adj'), Number(b.getAttribute('data-delta')));
+          });
+        });
+      }
+
+      // --- GLOBAL EVENT LISTENERS ---
+      document.querySelectorAll('.nav-tab').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.tab = btn.getAttribute('data-tab');
+          renderTabs();
+          if (state.tab === 'steps') renderStep();
+          if (state.tab === 'ingredients') renderIngredients();
+          if (state.tab === 'xray') renderXray();
+          if (state.tab === 'timers') renderTimers();
+        });
+      });
+
+      document.querySelectorAll('.batch-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.batch = Number(btn.getAttribute('data-batch'));
+          saveState();
+          renderHeaderAndBatch();
+          renderStep();
+          renderIngredients();
+          showToast('הכמויות עודכנו ל-' + state.batch + ' סופגניות!');
+        });
+      });
+
+      document.getElementById('soundToggle').addEventListener('click', function () {
+        state.soundOn = !state.soundOn;
+        saveState();
+        renderHeaderAndBatch();
+        showToast(state.soundOn ? 'צלילי טיימר הופעלו' : 'צלילי טיימר הושתקו');
+      });
+
+      document.getElementById('jumpToTimersBtn').addEventListener('click', function () {
+        state.tab = 'timers';
+        renderTabs();
+        renderTimers();
+      });
+
+      document.getElementById('prevStepBtn').addEventListener('click', function () {
+        if (state.stepIndex > 0) {
+          state.stepIndex -= 1;
+          saveState();
+          renderStep();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      document.getElementById('nextStepBtn').addEventListener('click', function () {
+        const steps = getSteps();
+        if (state.stepIndex < steps.length - 1) {
+          state.stepIndex += 1;
+          saveState();
+          renderStep();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          playChime('celebrate');
+          showToast('אלוף! ' + state.batch + ' סופגניות קראנצ\' מוכנות למכירה! 🍩');
+          if (typeof confetti === 'function') {
+            confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
+          }
+        }
+      });
+
+      document.querySelectorAll('.ing-filter').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.ingFilter = btn.getAttribute('data-filter');
+          renderIngredients();
+        });
+      });
+
+      document.getElementById('resetChecksBtn').addEventListener('click', function () {
+        state.checked = {};
+        saveState();
+        renderIngredients();
+        showToast('רשימת השקילה אופסה');
+      });
+
+      document.querySelectorAll('.xray-layer').forEach(function (g) {
+        g.addEventListener('click', function () {
+          state.selectedLayer = g.getAttribute('data-layer');
+          renderXray();
+        });
+      });
+
+      // --- INSTALLABLE / OFFLINE ---
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('sw.js').catch(function () {});
+        });
+      }
+
+      // --- INIT ---
+      renderHeaderAndBatch();
+      renderTabs();
+      renderStep();
+      renderIngredients();
+      renderXray();
+      renderTimers();
+    })();
+  </script>
+</body>
+</html>
