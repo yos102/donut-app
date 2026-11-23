@@ -563,13 +563,15 @@
         timers.forEach(function (t) {
           if (t.running) {
             if (t.leftSec > 0) {
-              t.leftSec = Math.max(0, t.leftSec - dt);
+              t.leftSec = t.endAt ? Math.max(0, Math.ceil((t.endAt - nowTs) / 1000)) : Math.max(0, t.leftSec - dt);
               anyRunning = true;
               if (!firstActive) firstActive = t;
             }
             if (t.leftSec === 0) {
               t.running = false;
               finished = true;
+              t.endAt = 0;
+              saveTimers();
               showAlarm(t.label);
               notifyDone(t);
             }
@@ -624,6 +626,13 @@
         if (t.leftSec === 0) t.leftSec = t.defaultSec;
         t.running = !t.running;
         if (t.running) {
+          t.endAt = Date.now() + t.leftSec * 1000;
+        } else if (t.endAt) {
+          t.leftSec = Math.max(0, Math.ceil((t.endAt - Date.now()) / 1000));
+          t.endAt = 0;
+        }
+        saveTimers();
+        if (t.running) {
           askNotifyPermission();
           ensureInterval();
           showToast('הופעל טיימר: ' + t.label);
@@ -638,7 +647,9 @@
         const t = timers.find(function (x) { return x.id === id; });
         if (!t) return;
         t.running = false;
+        t.endAt = 0;
         t.leftSec = t.defaultSec;
+        saveTimers();
         const active = timers.find(function (x) { return x.running; });
         updateActiveTimerBanner(active);
         renderTimers();
@@ -648,7 +659,10 @@
       function adjustTimer(id, deltaMin) {
         const t = timers.find(function (x) { return x.id === id; });
         if (!t) return;
+        if (t.running && t.endAt) t.leftSec = Math.max(0, Math.ceil((t.endAt - Date.now()) / 1000));
         t.leftSec = Math.max(60, t.leftSec + deltaMin * 60);
+        if (t.running) t.endAt = Date.now() + t.leftSec * 1000;
+        saveTimers();
         renderTimers();
       }
 
@@ -1618,6 +1632,54 @@
         if (state.keepAwake) requestWakeLock(); else if (!timerInterval) releaseWakeLock();
       });
 
+      // --- TIMERS SURVIVE REFRESH / LEAVING THE APP ---
+      const TIMERS_KEY = 'crunch_sufganiyot_timers_v1';
+      function saveTimers() {
+        try {
+          localStorage.setItem(TIMERS_KEY, JSON.stringify(timers.map(function (t) {
+            return { id: t.id, running: t.running, leftSec: t.leftSec, endAt: t.endAt || 0 };
+          })));
+        } catch (e) {}
+      }
+      function restoreTimers() {
+        let saved = null;
+        try { saved = JSON.parse(localStorage.getItem(TIMERS_KEY) || 'null'); } catch (e) {}
+        if (!Array.isArray(saved)) return;
+        const now = Date.now();
+        const doneWhileAway = [];
+        saved.forEach(function (sv) {
+          const t = timers.find(function (x) { return x.id === sv.id; });
+          if (!t || typeof sv.leftSec !== 'number') return;
+          if (sv.running && sv.endAt) {
+            const remaining = Math.ceil((sv.endAt - now) / 1000);
+            if (remaining > 0) {
+              t.running = true;
+              t.endAt = sv.endAt;
+              t.leftSec = remaining;
+            } else {
+              t.running = false;
+              t.endAt = 0;
+              t.leftSec = 0;
+              doneWhileAway.push(t.label);
+            }
+          } else {
+            t.running = false;
+            t.endAt = 0;
+            t.leftSec = Math.max(0, Math.min(sv.leftSec, 24 * 3600));
+          }
+        });
+        saveTimers();
+        const active = timers.find(function (x) { return x.running; });
+        if (active) {
+          lastTick = Date.now();
+          ensureInterval();
+          updateActiveTimerBanner(active);
+        }
+        if (doneWhileAway.length) {
+          showAlarm(doneWhileAway.join('\n') + '\n(הסתיים בזמן שלא היית באפליקציה)');
+        }
+      }
+
       // --- INSTALLABLE / OFFLINE ---
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
@@ -1626,6 +1688,7 @@
       }
 
       // --- INIT ---
+      restoreTimers();
       renderHeaderAndBatch();
       renderTabs();
       renderStep();
