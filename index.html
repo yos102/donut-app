@@ -79,6 +79,7 @@
     html.dark [class*="bg-[#231815]"] { background-color: #6b5444 !important; color: #fff !important; }
     html.dark input, html.dark textarea { background: #1b1714 !important; color: #f1e8e1 !important; border-color: #4a3a30 !important; }
     html.dark .bg-amber-100 { background-color: #4a3622 !important; }
+    html.dark div[class*="bg-[#FFFBF5]"] { background-color: #241e1a !important; }
     html.dark [class*="bg-sky-50"] { background-color: #14283a !important; }
     html.dark [class*="border-sky"] { border-color: #2f4a63 !important; }
     html.dark [class*="text-sky-"]:not([class*="bg-"]) { color: #7dd3fc !important; }
@@ -455,7 +456,8 @@
         theme: 'auto',
         fontScale: 100,
         keepAwake: false,
-        ingMode: 'weigh'
+        ingMode: 'weigh',
+        stepIngOpen: true
       };
 
       let state = Object.assign({}, DEFAULT_STATE);
@@ -484,7 +486,8 @@
             theme: state.theme,
             fontScale: state.fontScale,
             keepAwake: state.keepAwake,
-            ingMode: state.ingMode
+            ingMode: state.ingMode,
+            stepIngOpen: state.stepIngOpen
           }));
         } catch (e) {}
       }
@@ -754,6 +757,17 @@
             time: '35 דק\' נטו | + התפחה ואפייה',
             img: 'step1.jpg',
             timers: ['t_rise1', 't_rise2', 't_bake'],
+            stepIngredients: [
+              { id: 'ferrero', label: 'קרם פררו (לליבות)', qty: sc(60) + ' גרם' },
+              { id: 'strawberry', label: 'מילוי תות שדה (לליבות)', qty: sc(70) + ' גרם' },
+              { id: 'flour', label: 'קמח לבן', qty: sc(240) + ' גרם' },
+              { id: 'sugar', label: 'סוכר לבן', qty: sc(35) + ' גרם' },
+              { id: 'yeast', label: 'שמרים יבשים', qty: sc(5) + ' גרם' },
+              { id: 'eggs', label: 'ביצה L + חלמון', qty: sc(75) + ' גרם' },
+              { id: 'milk', label: 'חלב פושר', qty: mlg(65, 1.03) },
+              { id: 'butter', label: 'חמאה רכה', qty: sc(65) + ' גרם' },
+              { id: 'salt', label: 'מלח', qty: sc(3) + ' גרם' }
+            ],
             bodyHtml:
               '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
                 '<div class="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80">' +
@@ -781,6 +795,15 @@
             time: '30 דק\' נטו | + 4-5 ש\' הקפאה (או לילה)',
             img: 'step2.jpg',
             timers: ['t_gel'],
+            stepIngredients: [
+              { id: 'gelatin', label: 'ג\'לטין (+ ' + sc(30) + ' ג\' מים קרים)', qty: sc(6) + ' גרם' },
+              { id: 'cream_whip', label: 'שמנת 38% קרה (להקצפה)', qty: mlg(250, 1) },
+              { id: 'cream_hot', label: 'שמנת 38% (לחימום)', qty: mlg(120, 1) },
+              { id: 'choc_mousse', label: 'שוקולד לבן (ל-3 המוסים)', qty: sc(150) + ' גרם' },
+              { id: 'nocciola', label: 'White Nocciola (למוס)', qty: sc(45) + ' גרם' },
+              { id: 'white_cookies', label: 'White Cookies (למוס)', qty: sc(50) + ' גרם' },
+              { id: 'oreos', label: 'אוראו שלמות (להטבעה)', qty: per + ' יח\'' }
+            ],
             hasFlavorTabs: true,
             bodyHtml:
               '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
@@ -804,6 +827,12 @@
             time: '15 דק\' נטו | + 40 דק\' הקפאה',
             img: 'step3.jpg',
             timers: ['t_join'],
+            stepIngredients: [
+              { id: 'nocciola', label: 'White Nocciola (קראנצ\' בואנו)', qty: sc(45) + ' גרם' },
+              { id: 'white_cookies', label: 'White Cookies (הדבקת אוראו)', qty: sc(40) + ' גרם' },
+              { id: 'pearls', label: 'פניני קראנצ\' מיקס', qty: sc(35) + ' גרם' },
+              { id: 'petit', label: 'ממרח פתיבר קראנצ\' (תות)', qty: sc(60) + ' גרם' }
+            ],
             bodyHtml:
               '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
                 '<div class="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80">' +
@@ -830,6 +859,15 @@
             time: '25 דק\' נטו | מוכן להקפאה או הגשה',
             img: 'step4.jpg',
             timers: ['t_dip'],
+            stepIngredients: [
+              { id: 'dip_choc', label: 'שוקולד לבן לטבילה (80/20)', qty: cq(320) + ' גרם' },
+              { id: 'dip_cb', label: 'חמאת קקאו לטבילה (80/20)', qty: cq(80) + ' גרם' },
+              { id: 'spray_choc', label: 'שוקולד לבן לריסוס (60/40)', qty: cq(100) + ' גרם' },
+              { id: 'spray_cb', label: 'חמאת קקאו לריסוס (60/40)', qty: cq(65) + ' גרם' },
+              { id: 'strawberry', label: 'מילוי תות (טיפה מעל)', qty: sc(15) + ' גרם' },
+              { id: 'oreos', label: 'עוגיות אוראו (חצויות מעל)', qty: sc(2) + ' יח\'' },
+              { id: 'mekupelet', label: 'מיני מקופלת (חצויות מעל)', qty: sc(2) + ' יח\'' }
+            ],
             isFinal: true,
             bodyHtml:
               '<div class="space-y-3 text-sm text-[#3A2D28] leading-relaxed">' +
@@ -963,6 +1001,30 @@
           '</button>';
         }).join('');
 
+        const stepIngs = cur.stepIngredients || [];
+        const stepDoneCount = stepIngs.filter(function (si) { return !!state.checked['step_' + cur.num + '_' + si.id]; }).length;
+        const stepIngItemsHtml = stepIngs.map(function (si) {
+          const key = 'step_' + cur.num + '_' + si.id;
+          const isDone = !!state.checked[key];
+          return '<button type="button" data-step-ing="' + key + '" class="w-full text-right flex items-center justify-between gap-2 py-3 px-3 rounded-xl border transition text-sm active:scale-[0.99] ' +
+            (isDone ? 'bg-emerald-50/70 border-emerald-200 text-[#6B5B53]' : 'bg-white border-amber-100 text-[#231815]') + '">' +
+            '<span class="flex items-center gap-2">' +
+              '<span class="w-5 h-5 rounded-full border flex items-center justify-center text-[11px] font-black shrink-0 ' +
+                (isDone ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-amber-300 text-transparent') + '">✓</span>' +
+              '<span class="' + (isDone ? 'line-through' : 'font-medium') + '">' + si.label + '</span>' +
+            '</span>' +
+            '<span class="font-display font-bold text-amber-800 shrink-0 text-left">' + si.qty + '</span>' +
+          '</button>';
+        }).join('');
+        const stepIngBoxHtml = stepIngs.length ?
+          '<div class="mb-4 rounded-2xl bg-[#FFFBF5] border border-amber-200/90 overflow-hidden">' +
+            '<button type="button" id="toggleStepIngBtn" class="w-full px-3.5 py-3 flex items-center justify-between text-sm font-bold text-[#231815] active:bg-amber-50 transition">' +
+              '<span class="flex items-center gap-1.5"><span>⚖️</span><span>מה להוציא לשלב הזה (' + stepDoneCount + '/' + stepIngs.length + ')</span></span>' +
+              '<span class="text-amber-700">' + (state.stepIngOpen ? 'הסתר ▲' : 'הצג ▼') + '</span>' +
+            '</button>' +
+            (state.stepIngOpen ? '<div class="px-3 pb-3 grid grid-cols-1 gap-1.5">' + stepIngItemsHtml + '</div>' : '') +
+          '</div>' : '';
+
         const card = document.getElementById('stepCard');
         card.innerHTML =
           '<div class="relative bg-[#EEF3F1]">' +
@@ -973,6 +1035,7 @@
             '<div class="text-xs font-bold text-amber-700 mb-1">' + cur.time + '</div>' +
             '<h2 class="text-xl font-black text-[#231815] mb-3 leading-snug">' + cur.title + '</h2>' +
             '<div class="flex flex-wrap gap-2 mb-4">' + timerButtonsHtml + '</div>' +
+            stepIngBoxHtml +
             cur.bodyHtml +
             '<div class="mt-4"><label class="text-xs font-bold text-[#6B5B53]" for="stepNote">📝 ההערות שלי לשלב</label>' +
             '<textarea id="stepNote" rows="2" placeholder="למשל: להוסיף 5 דקות, לשנות כמות..." class="w-full mt-1 rounded-xl border border-amber-200 p-3 text-sm"></textarea></div>' +
@@ -983,6 +1046,23 @@
         card.querySelectorAll('[data-quick-timer]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             toggleTimer(btn.getAttribute('data-quick-timer'));
+          });
+        });
+
+        const toggleIngBtn = document.getElementById('toggleStepIngBtn');
+        if (toggleIngBtn) {
+          toggleIngBtn.addEventListener('click', function () {
+            state.stepIngOpen = !state.stepIngOpen;
+            saveState();
+            renderStep();
+          });
+        }
+        card.querySelectorAll('[data-step-ing]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const key = btn.getAttribute('data-step-ing');
+            state.checked[key] = !state.checked[key];
+            saveState();
+            renderStep();
           });
         });
 
