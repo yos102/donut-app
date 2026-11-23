@@ -79,6 +79,9 @@
     html.dark [class*="bg-[#231815]"] { background-color: #6b5444 !important; color: #fff !important; }
     html.dark input, html.dark textarea { background: #1b1714 !important; color: #f1e8e1 !important; border-color: #4a3a30 !important; }
     html.dark .bg-amber-100 { background-color: #4a3622 !important; }
+    html.dark [class*="bg-sky-50"] { background-color: #14283a !important; }
+    html.dark [class*="border-sky"] { border-color: #2f4a63 !important; }
+    html.dark [class*="text-sky-"]:not([class*="bg-"]) { color: #7dd3fc !important; }
     html.dark button[class*="bg-amber-100"] { background-color: #4a3622 !important; color: #f0b36b !important; }
     html.dark [class*="bg-amber-100/90"] { background-color: #3a2c1c !important; }
   </style>
@@ -765,6 +768,11 @@
                   '<div class="font-bold text-emerald-900 mb-1">3. אפייה ישר בתבניות ה-7 ס"מ</div>' +
                   '<p>מחלקים ל-<strong>' + state.batch + ' כדורים של ~35 ג\'</strong>, משמנים קלות את שקעי תבנית ה-7 ס"מ, מתפיחים 35 דק\' עד השפה ואופים ב-<strong>175° למשך 14-16 דק\'</strong>. מצננים, מיישרים שפה בסכין, ושוטפים את התבניות לשלב המוס.</p>' +
                 '</div>' +
+                '<div class="bg-sky-50/90 rounded-2xl p-3.5 border border-sky-200">' +
+                  '<div class="font-bold text-sky-900 mb-1">⚡ בזמן שמחכים (מקביליות):</div>' +
+                  '<p>• <strong>בהתפחה הראשונה (60 דק\'):</strong> מזלפים ומקפיאים את הליבות ב-3.5 ס"מ, ושוקלים מראש ל-3 קערות את השוקולד הלבן והממרחים למוסים.<br>' +
+                  '• <strong>בזמן האפייה (15 דק\'):</strong> משרים את הג\'לטין במים קרים (10 דק\') ומכינים מיקסר ושמנת קרה, כדי שברגע שהתבניות נשטפות ויבשות - עוברים מיד למוס!</p>' +
+                '</div>' +
               '</div>'
           },
           {
@@ -783,6 +791,11 @@
                 '</div>' +
                 '<div id="stepFlavorBox"></div>' +
                 '<p class="text-xs text-[#6B5B53] px-1">ממלאים את ' + state.batch + ' שקעי ה-7 ס"מ (' + per + ' מכל טעם), מהדקים מוס לדפנות, מטביעים את הליבה/אוראו במרכז, סוגרים עד 90% גובה ומקפיאים 4-5 שעות (או לילה).</p>' +
+                '<div class="bg-sky-50/90 rounded-2xl p-3.5 border border-sky-200">' +
+                  '<div class="font-bold text-sky-900 mb-1">⚡ בזמן ההקפאה (4-5 ש\' / לילה):</div>' +
+                  '<p>• עוטפים את חצאי הבריוש האפויים אטום בניילון נצמד (בלי למרוח עדיין קראנצ\' כדי שהפנינים יישארו פריכות!).<br>' +
+                  '• שוקלים מראש את השוקולד וחמאת הקקאו לטבילה ולמרסס, וחותכים את האוראו והמקופלת לקישוט.</p>' +
+                '</div>' +
               '</div>'
           },
           {
@@ -805,6 +818,10 @@
                   '<div class="font-bold text-amber-900 mb-1">2. מצמידים ומקפיאים קצר</div>' +
                   '<p>עובדים עם כפפות: מחלצים כל כיפת מוס קפואה מהסיליקון, מניחים ישר מעל חצי הבריוש המרוח בקראנצ\' ולוחצים בעדינות. מחזירים למקפיא ל-<strong>40 דקות</strong> כדי שהבריוש יתקרר היטב לפני הטבילה.</p>' +
                 '</div>' +
+                '<div class="bg-sky-50/90 rounded-2xl p-3.5 border border-sky-200">' +
+                  '<div class="font-bold text-sky-900 mb-1">⚡ בזמן הקפאת החיבור (40 דק\'):</div>' +
+                  '<p>ממיסים את תערובת הטבילה הלבנה (80/20) ונותנים לה להצטנן לטמפרטורת העבודה (<strong>32-34°</strong>). מסדרים מגש עם נייר אפייה ושיפודים מוכנים על השיש.</p>' +
+                '</div>' +
               '</div>'
           },
           {
@@ -819,6 +836,10 @@
                 '<div class="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80">' +
                   '<div class="font-bold text-[#231815] mb-1">1. טבילה דקה לקראק (32-34°)</div>' +
                   '<p>ממיסים <strong>' + cq(320) + ' ג\' שוקולד לבן + ' + cq(80) + ' ג\' חמאת קקאו</strong> בכלי צר ועמוק. נועצים שיפוד בתחתית כל סופגנייה קפואה, טובלים טבילה מהירה אחת ומחזירים למקפיא ל-<strong>15 דקות</strong>.</p>' +
+                '</div>' +
+                '<div class="bg-sky-50/90 rounded-2xl p-3.5 border border-sky-200">' +
+                  '<div class="font-bold text-sky-900 mb-1">⚡ בזמן 15 דקות הקירור אחרי הטבילה:</div>' +
+                  '<p>מחממים את תערובת הקטיפה במרסס (60/40) ל-<strong>45°</strong>, עושים התזת ניסיון קצרה על נייר סופג לבדיקת הגוון, ומסדרים לידך את כל הקישוטים ותחתיות הזהב.</p>' +
                 '</div>' +
                 '<div class="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80">' +
                   '<div class="font-bold text-amber-900 mb-1">2. ריסוס קטיפה לפס הלבן (45°)</div>' +
