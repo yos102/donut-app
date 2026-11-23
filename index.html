@@ -670,10 +670,10 @@
         { id: 'sugar', name: 'סוכר לבן', base: 35, unit: 'גרם', cat: 'fridge', note: 'לבצק הבריוש' },
         { id: 'yeast', name: 'שמרים יבשים', base: 5, unit: 'גרם', cat: 'fridge', note: 'כפית וחצי' },
         { id: 'eggs', name: 'ביצה L + חלמון (סה"כ ~75 ג\')', base: 75, unit: 'גרם', cat: 'fridge', note: 'לעשירות הבריוש' },
-        { id: 'milk', name: 'חלב פושר', base: 65, unit: 'מ"ל', cat: 'fridge', note: 'לבצק הבריוש' },
+        { id: 'milk', name: 'חלב פושר', base: 65, unit: 'מ"ל', dens: 1.03, cat: 'fridge', note: 'לבצק הבריוש' },
         { id: 'butter', name: 'חמאה רכה', base: 65, unit: 'גרם', cat: 'fridge', note: 'לקיפול בבצק' },
-        { id: 'cream_whip', name: 'שמנת מתוקה 38% (להקצפה)', base: 250, unit: 'מ"ל', cat: 'fridge', note: 'קרה מאוד - מחולקת ל-3 מוסים' },
-        { id: 'cream_hot', name: 'שמנת מתוקה 38% (לחימום)', base: 120, unit: 'מ"ל', cat: 'fridge', note: '40 מ"ל חמה לכל מוס' },
+        { id: 'cream_whip', name: 'שמנת מתוקה 38% (להקצפה)', base: 250, unit: 'מ"ל', dens: 1, cat: 'fridge', note: 'קרה מאוד - מחולקת ל-3 מוסים' },
+        { id: 'cream_hot', name: 'שמנת מתוקה 38% (לחימום)', base: 120, unit: 'מ"ל', dens: 1, cat: 'fridge', note: '40 מ"ל (~40 ג\') חמה לכל מוס' },
         { id: 'gelatin', name: 'אבקת ג\'לטין (+ מים קרים x5)', base: 6, unit: 'גרם', cat: 'fridge', note: 'משרים ב-30 ג\' מים קרים' },
         // Pantry (User already has!)
         { id: 'choc_mousse', name: 'שוקולד לבן (ל-3 המוסים)', base: 150, unit: 'גרם', cat: 'pantry', note: '40 בואנו + 40 אוראו + 70 תות' },
@@ -715,7 +715,7 @@
           name: 'כיפת המוס',
           badge: 'חצי עליון 7 ס"מ',
           title: 'מוס אוורירי מיוצב בג\'לטין',
-          desc: 'חצי כדור 7 ס"מ אחד בלבד לכל סופגנייה (~80 מ"ל). מכינים קצפת אחת (250 מ"ל) ומסת ג\'לטין אחת ומפצלים ל-3 טעמים: בואנו לאטה, אוראו לבן, וניל מדגסקר.',
+          desc: 'חצי כדור 7 ס"מ אחד בלבד לכל סופגנייה (~80 מ"ל). מכינים קצפת אחת (250 מ"ל, ~250 ג\') ומסת ג\'לטין אחת ומפצלים ל-3 טעמים: בואנו לאטה, אוראו לבן, וניל מדגסקר.',
           tip: 'לא מקפלים קצפת כשהגנאש חם מ-36° (היא תימס) ולא קר מ-28° (הג\'לטין יתגבש לגושים).'
         },
         {
@@ -762,7 +762,7 @@
                 '</div>' +
                 '<div class="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80">' +
                   '<div class="font-bold text-[#231815] mb-1">2. בצק בריוש (' + state.batch + ' חצאים)</div>' +
-                  '<p>לשים <strong>' + sc(240) + ' ג\' קמח</strong>, <strong>' + sc(35) + ' ג\' סוכר</strong>, <strong>' + sc(5) + ' ג\' שמרים</strong>, <strong>' + sc(75) + ' ג\' ביצים</strong> ו-<strong>' + sc(65) + ' מ"ל חלב</strong> 5 דק\'. מוסיפים <strong>' + sc(3) + ' ג\' מלח</strong> ו-<strong>' + sc(65) + ' ג\' חמאה רכה</strong> ולשים 7 דק\'. מתפיחים שעה.</p>' +
+                  '<p>לשים <strong>' + sc(240) + ' ג\' קמח</strong>, <strong>' + sc(35) + ' ג\' סוכר</strong>, <strong>' + sc(5) + ' ג\' שמרים</strong>, <strong>' + sc(75) + ' ג\' ביצים</strong> ו-<strong>' + mlg(65, 1.03) + ' חלב</strong> 5 דק\'. מוסיפים <strong>' + sc(3) + ' ג\' מלח</strong> ו-<strong>' + sc(65) + ' ג\' חמאה רכה</strong> ולשים 7 דק\'. מתפיחים שעה.</p>' +
                 '</div>' +
                 '<div class="bg-emerald-50/70 rounded-2xl p-3.5 border border-emerald-200/80">' +
                   '<div class="font-bold text-emerald-900 mb-1">3. אפייה ישר בתבניות ה-7 ס"מ</div>' +
@@ -787,7 +787,7 @@
                 '<div class="bg-amber-50/90 rounded-2xl p-3.5 border border-amber-200/80">' +
                   '<div class="font-bold text-amber-900 mb-1">בסיס משותף ל-3 הטעמים:</div>' +
                   '<p>• משרים <strong>' + sc(6) + ' ג\' ג\'לטין + ' + sc(30) + ' ג\' מים קרים</strong> ל-10 דק\' (מחלקים ל-<strong>' + sc(12) + ' ג\' לטעם</strong>).<br>' +
-                  '• מקציפים <strong>' + sc(250) + ' מ"ל שמנת קרה</strong> למרקם יוגורט רך (<strong>' + sc(80) + '-' + sc(85) + ' ג\' לטעם</strong>).</p>' +
+                  '• מקציפים <strong>' + mlg(250, 1) + ' שמנת קרה</strong> למרקם יוגורט רך (<strong>' + sc(80) + '-' + sc(85) + ' ג\' לטעם</strong>).</p>' +
                 '</div>' +
                 '<div id="stepFlavorBox"></div>' +
                 '<p class="text-xs text-[#6B5B53] px-1">ממלאים את ' + state.batch + ' שקעי ה-7 ס"מ (' + per + ' מכל טעם), מהדקים מוס לדפנות, מטביעים את הליבה/אוראו במרכז, סוגרים עד 90% גובה ומקפיאים 4-5 שעות (או לילה).</p>' +
@@ -865,17 +865,17 @@
           bueno: {
             title: 'בואנו-פררו (' + per + ' כיפות)',
             color: 'amber',
-            text: 'מחממים <strong>' + sc(40) + ' מ"ל שמנת</strong> + ממיסים <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(40) + ' ג\' שוקולד לבן + ' + sc(45) + ' ג\' White Nocciola</strong>. מערבבים חלק, מצננים ל-34° ומקפלים <strong>' + sc(80) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>ליבת קרם פררו קפואה</strong>.'
+            text: 'מחממים <strong>' + mlg(40, 1) + ' שמנת</strong> + ממיסים <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(40) + ' ג\' שוקולד לבן + ' + sc(45) + ' ג\' White Nocciola</strong>. מערבבים חלק, מצננים ל-34° ומקפלים <strong>' + sc(80) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>ליבת קרם פררו קפואה</strong>.'
           },
           oreo: {
             title: 'אוראו קראנצ\' (' + per + ' כיפות)',
             color: 'stone',
-            text: 'מחממים <strong>' + sc(40) + ' מ"ל שמנת</strong> + <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(40) + ' ג\' שוקולד לבן</strong>, מערבבים פנימה <strong>' + sc(50) + ' ג\' White Cookies</strong> (בלי לטחון!), מצננים ל-34° ומקפלים <strong>' + sc(80) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>עוגיית אוראו שלמה</strong>!'
+            text: 'מחממים <strong>' + mlg(40, 1) + ' שמנת</strong> + <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(40) + ' ג\' שוקולד לבן</strong>, מערבבים פנימה <strong>' + sc(50) + ' ג\' White Cookies</strong> (בלי לטחון!), מצננים ל-34° ומקפלים <strong>' + sc(80) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>עוגיית אוראו שלמה</strong>!'
           },
           strawberry: {
             title: 'תות שדה וניל (' + per + ' כיפות)',
             color: 'rose',
-            text: 'מחממים <strong>' + sc(40) + ' מ"ל שמנת</strong> עם <strong>חצי כפית וניל</strong> + <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(70) + ' ג\' שוקולד לבן</strong>. טוחנים חלק, מצננים ל-34° ומקפלים <strong>' + sc(85) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>ליבת מילוי תות קפואה</strong>.'
+            text: 'מחממים <strong>' + mlg(40, 1) + ' שמנת</strong> עם <strong>חצי כפית וניל</strong> + <strong>' + sc(12) + ' ג\' מסת ג\'לטין</strong> -> יוצקים על <strong>' + sc(70) + ' ג\' שוקולד לבן</strong>. טוחנים חלק, מצננים ל-34° ומקפלים <strong>' + sc(85) + ' ג\' קצפת</strong>. מטביעים במרכז <strong>ליבת מילוי תות קפואה</strong>.'
           }
         };
         const f = flavors[state.activeFlavor];
@@ -1071,7 +1071,7 @@
                 '<div class="text-xs text-[#6B5B53]">' + item.note + '</div>' +
               '</div>' +
             '</div>' +
-            '<div class="font-display font-bold text-sm text-amber-800 whitespace-nowrap shrink-0">' + qty + ' ' + item.unit + '</div>' +
+            '<div class="font-display font-bold text-sm text-amber-800 shrink-0 text-left leading-tight">' + fmtQty(item, qty, true) + '</div>' +
           '</button>';
         }).join('');
 
@@ -1245,6 +1245,21 @@
       });
 
       // --- QUANTITY ---
+      // grams next to ml (approximate densities: milk 1.03, cream 1.0)
+      function gramsOf(ml, dens) { return Math.round(ml * dens); }
+      function mlg(v, dens) {
+        const ml = (v * state.batch) / 12;
+        return sc(v) + ' מ"ל (~' + gramsOf(ml, dens) + ' ג\')';
+      }
+      function fmtQty(item, qty, html) {
+        if (item.unit === 'מ"ל' && item.dens) {
+          const g = gramsOf(parseFloat(qty), item.dens);
+          return html
+            ? qty + ' מ"ל<br><span class="text-[11px] font-normal text-[#6B5B53]">(~' + g + ' ג\')</span>'
+            : qty + ' מ"ל (~' + g + ' ג\')';
+        }
+        return qty + ' ' + item.unit;
+      }
       function cq(v) { return state.batch <= 6 ? String(v) : sc(v); }
       function setBatch(n) {
         n = Math.max(3, Math.min(60, Math.round(n / 3) * 3));
@@ -1381,7 +1396,7 @@
           const items = need.filter(function (i) { return i.cat === g[0]; });
           if (!items.length) return;
           text += '\n' + g[1] + ':\n';
-          items.forEach(function (i) { text += '• ' + i.name + ' - ' + shopQty(i) + ' ' + i.unit + '\n'; });
+          items.forEach(function (i) { text += '• ' + i.name + ' - ' + fmtQty(i, shopQty(i), false) + '\n'; });
         });
         if (navigator.share) { navigator.share({ text: text }).catch(function () {}); } else { copyText(text); }
       }
@@ -1409,7 +1424,7 @@
                   '<span class="px-2 h-6 rounded-full border-2 flex items-center justify-center text-[11px] font-black shrink-0 ' + (have ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-amber-300 text-amber-800') + '">' + (have ? 'יש לי ✓' : 'יש לי?') + '</span>' +
                   '<div class="font-bold text-sm ' + (have ? 'line-through text-[#6B5B53]' : 'text-[#231815]') + '">' + item.name + '</div>' +
                 '</div>' +
-                '<div class="font-display font-bold text-sm text-amber-800 whitespace-nowrap shrink-0">' + shopQty(item) + ' ' + item.unit + '</div>' +
+                '<div class="font-display font-bold text-sm text-amber-800 shrink-0 text-left leading-tight">' + fmtQty(item, shopQty(item), true) + '</div>' +
               '</button>';
             }).join('') + '</div>';
         });
